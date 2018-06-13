@@ -2,6 +2,7 @@ package main
 
 import (
   "errors"
+  "os"
 
   log "github.com/sirupsen/logrus"
 )
