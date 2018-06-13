@@ -1,192 +1,190 @@
 package main
 
 import (
-  "fmt"
-  "errors"
-  "syscall"
-  "time"
+	"errors"
+	"fmt"
+	"syscall"
+	"time"
 
-  "github.com/aws/aws-sdk-go/aws"
-  "github.com/aws/aws-sdk-go/aws/awserr"
-  "github.com/aws/aws-sdk-go/aws/ec2metadata"
-  "github.com/aws/aws-sdk-go/aws/session"
-  "github.com/aws/aws-sdk-go/service/ec2"
-  log "github.com/sirupsen/logrus"
-  "github.com/urfave/cli"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/aws/aws-sdk-go/aws/ec2metadata"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/ec2"
+	log "github.com/sirupsen/logrus"
+	"github.com/urfave/cli"
 )
 
 var start time.Time
 
 func run(c *cli.Context) error {
-  start = time.Now()
-  configureLogging(cfg.Log.Level, cfg.Log.Format)
+	start = time.Now()
+	configureLogging(cfg.Log.Level, cfg.Log.Format)
 
-  log.Debug("Starting AWS MDS API session")
-  mdsClient, err := getAWSMDSClient()
-  if err != nil {
-    return exit(cli.NewExitError(err.Error(), 1))
-  }
+	log.Debug("Starting AWS MDS API session")
+	mdsClient, err := getAWSMDSClient()
+	if err != nil {
+		return exit(cli.NewExitError(err.Error(), 1))
+	}
 
-  log.Debug("Fetching current instance-id from MDS API")
-  instanceId, err := getInstanceId(mdsClient)
-  if err != nil {
-    return exit(cli.NewExitError(err.Error(), 1))
-  }
+	log.Debug("Fetching current instance-id from MDS API")
+	instanceID, err := getinstanceID(mdsClient)
+	if err != nil {
+		return exit(cli.NewExitError(err.Error(), 1))
+	}
 
-  log.Debug("Fetching current AZ from MDS API")
-  az, err := getInstanceAZ(mdsClient)
-  if err != nil {
-    return exit(cli.NewExitError(err.Error(), 1))
-  }
+	log.Debug("Fetching current AZ from MDS API")
+	az, err := getInstanceAZ(mdsClient)
+	if err != nil {
+		return exit(cli.NewExitError(err.Error(), 1))
+	}
 
-  region := computeRegionFromAZ(az)
-  log.Infof("Computed region : '%s'", region)
+	region := computeRegionFromAZ(az)
+	log.Infof("Computed region : '%s'", region)
 
-  log.Debug("Starting AWS EC2 API session")
-  ec2Client := getAWSEC2Client(region)
+	log.Debug("Starting AWS EC2 API session")
+	ec2Client := getAWSEC2Client(region)
 
-  log.Debugf("Querying Input Tag '%s' from EC2 API", cfg.InputTag )
-  inputTagValue, err := getInputTagValue(cfg.InputTag, instanceId, ec2Client)
-  if err != nil {
-    return exit(cli.NewExitError(analyzeEC2APIErrors(err), 1))
-  }
-  log.Infof("Found instance name tag : '%s'", inputTagValue)
+	log.Debugf("Querying Input Tag '%s' from EC2 API", cfg.InputTag)
+	inputTagValue, err := getInputTagValue(cfg.InputTag, instanceID, ec2Client)
+	if err != nil {
+		return exit(cli.NewExitError(analyzeEC2APIErrors(err), 1))
+	}
+	log.Infof("Found instance name tag : '%s'", inputTagValue)
 
-  hostname := computeHostname(inputTagValue, cfg.Separator, instanceId, cfg.IdLength)
-  log.Infof("Computed unique hostname : '%s'", hostname)
+	hostname := computeHostname(inputTagValue, cfg.Separator, instanceID, cfg.IDLength)
+	log.Infof("Computed unique hostname : '%s'", hostname)
 
-  if ! cfg.DryRun {
-    log.Infof("Setting instance hostname locally")
-    err = setHostname(hostname)
-    if err != nil {
-      return exit(cli.NewExitError(err.Error(), 1))
-    }
+	if !cfg.DryRun {
+		log.Infof("Setting instance hostname locally")
+		err = setHostname(hostname)
+		if err != nil {
+			return exit(cli.NewExitError(err.Error(), 1))
+		}
 
-    log.Infof("Setting hostname on configured instance tag '%s'")
-    err = setOutputTagValue(cfg.OutputTag, hostname, instanceId, ec2Client)
-    if err != nil {
-      return exit(cli.NewExitError(analyzeEC2APIErrors(err), 1))
-    }
-  }
+		log.Infof("Setting hostname on configured instance tag '%s'")
+		err = setOutputTagValue(cfg.OutputTag, hostname, instanceID, ec2Client)
+		if err != nil {
+			return exit(cli.NewExitError(analyzeEC2APIErrors(err), 1))
+		}
+	}
 
-  return exit(nil)
+	return exit(nil)
 }
 
 func getAWSMDSClient() (*ec2metadata.EC2Metadata, error) {
-  client := ec2metadata.New(session.New())
+	client := ec2metadata.New(session.New())
 
-  if ! client.Available() {
-    return client, errors.New("Unable to access the metadata service, are you running this binary from an AWS EC2 instance?")
-  }
+	if !client.Available() {
+		return client, errors.New("Unable to access the metadata service, are you running this binary from an AWS EC2 instance?")
+	}
 
-  return client, nil
+	return client, nil
 }
 
 func getAWSEC2Client(region string) (client *ec2.EC2) {
-  client = ec2.New(session.New(&aws.Config{
-  	Region: aws.String(region),
-  }))
+	client = ec2.New(session.New(&aws.Config{
+		Region: aws.String(region),
+	}))
 
-  return
+	return
 }
 
 func getInstanceAZ(c *ec2metadata.EC2Metadata) (az string, err error) {
 
-  az, err = c.GetMetadata("placement/availability-zone")
-  log.Infof("Found AZ: '%s'", az )
+	az, err = c.GetMetadata("placement/availability-zone")
+	log.Infof("Found AZ: '%s'", az)
 
-  return
+	return
 }
 
 func computeRegionFromAZ(az string) string {
-  return az[:len(az)-1]
+	return az[:len(az)-1]
 }
 
-func getInstanceId(c *ec2metadata.EC2Metadata) (id string, err error) {
-  log.Debug("Querying instance-id from metadata service")
-  id, err = c.GetMetadata("instance-id")
-  log.Infof("Found instance-id : '%s'", id )
-  return
+func getinstanceID(c *ec2metadata.EC2Metadata) (id string, err error) {
+	log.Debug("Querying instance-id from metadata service")
+	id, err = c.GetMetadata("instance-id")
+	log.Infof("Found instance-id : '%s'", id)
+	return
 }
 
-func getInputTagValue(tag string, instanceId string, c *ec2.EC2) (string, error) {
-  log.Debug("Querying instance name tag from EC2 api endpoint")
+func getInputTagValue(tag string, instanceID string, c *ec2.EC2) (string, error) {
+	log.Debug("Querying instance name tag from EC2 api endpoint")
 
-  tags, err := c.DescribeTags(&ec2.DescribeTagsInput{
-      Filters: []*ec2.Filter{
-          {
-              Name: aws.String("resource-type"),
-              Values: []*string{
-                  aws.String("instance"),
-              },
-          },
-          {
-              Name: aws.String("key"),
-              Values: []*string{
-                  aws.String(tag),
-              },
-          },
-          {
-              Name: aws.String("resource-id"),
-              Values: []*string{
-                  aws.String(instanceId),
-              },
-          },
-      },
-  })
+	tags, err := c.DescribeTags(&ec2.DescribeTagsInput{
+		Filters: []*ec2.Filter{
+			{
+				Name: aws.String("resource-type"),
+				Values: []*string{
+					aws.String("instance"),
+				},
+			},
+			{
+				Name: aws.String("key"),
+				Values: []*string{
+					aws.String(tag),
+				},
+			},
+			{
+				Name: aws.String("resource-id"),
+				Values: []*string{
+					aws.String(instanceID),
+				},
+			},
+		},
+	})
 
-  if err != nil {
-    return "", err
-  }
+	if err != nil {
+		return "", err
+	}
 
-  if len(tags.Tags) != 1 {
-    return "", errors.New(fmt.Sprintf("Unexpected amount of tags retrieved : '%s',  expected 1", len(tags.Tags)))
-  }
+	if len(tags.Tags) != 1 {
+		return "", fmt.Errorf("Unexpected amount of tags retrieved : '%d',  expected 1", len(tags.Tags))
+	}
 
-  if *tags.Tags[0].Key != tag {
-    return "", errors.New(fmt.Sprintf("The tag fetched is not correct : '%s'", *tags.Tags[0].Key))
-  }
+	if *tags.Tags[0].Key != tag {
+		return "", fmt.Errorf("The tag fetched is not correct : '%s'", *tags.Tags[0].Key)
+	}
 
-  return *tags.Tags[0].Value, nil
+	return *tags.Tags[0].Value, nil
 }
 
 func analyzeEC2APIErrors(err error) string {
-  if err != nil {
-    if aerr, ok := err.(awserr.Error); ok {
-      return aerr.Error()
-    } else {
-      return err.Error()
-    }
-  } else {
-    return ""
-  }
+	if err != nil {
+		if aerr, ok := err.(awserr.Error); ok {
+			return aerr.Error()
+		}
+		return err.Error()
+	}
+	return ""
 }
 
-func computeHostname(base string, separator string, id string, idLength int) string {
-  return base + separator + id[2:2+idLength]
+func computeHostname(base string, separator string, id string, IDLength int) string {
+	return base + separator + id[2:2+IDLength]
 }
 
 func setHostname(hostname string) error {
-  return syscall.Sethostname([]byte(hostname))
+	return syscall.Sethostname([]byte(hostname))
 }
 
-func setOutputTagValue(tag string, hostname string, instanceId string, c *ec2.EC2) (err error) {
-  _, err = c.CreateTags(&ec2.CreateTagsInput{
-      Resources: []*string{
-        aws.String(instanceId),
-      },
-      Tags: []*ec2.Tag{
-          {
-              Key:   aws.String(tag),
-              Value: aws.String(hostname),
-          },
-      },
-  })
+func setOutputTagValue(tag string, hostname string, instanceID string, c *ec2.EC2) (err error) {
+	_, err = c.CreateTags(&ec2.CreateTagsInput{
+		Resources: []*string{
+			aws.String(instanceID),
+		},
+		Tags: []*ec2.Tag{
+			{
+				Key:   aws.String(tag),
+				Value: aws.String(hostname),
+			},
+		},
+	})
 
-  return
+	return
 }
 
 func exit(err error) error {
-  log.Debugf("Executed in %s, exiting..", time.Since(start))
-  return err
+	log.Debugf("Executed in %s, exiting..", time.Since(start))
+	return err
 }

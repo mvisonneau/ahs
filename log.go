@@ -1,10 +1,10 @@
 package main
 
 import (
-  "errors"
-  "os"
+	"errors"
+	"os"
 
-  log "github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 func configureLogging(level string, format string) error {
@@ -21,7 +21,7 @@ func configureLogging(level string, format string) error {
 	case "json":
 		log.SetFormatter(&log.JSONFormatter{})
 	default:
-    return errors.New("Invalid log format")
+		return errors.New("Invalid log format")
 	}
 
 	log.SetOutput(os.Stdout)

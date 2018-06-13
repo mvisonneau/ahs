@@ -26,7 +26,7 @@ func runCli() (c *cli.App) {
 			EnvVar:      "AHS_ID_LENGTH",
 			Usage:       "length of the id to keep in the hostname",
 			Value:       5,
-			Destination: &cfg.IdLength,
+			Destination: &cfg.IDLength,
 		},
 		cli.StringFlag{
 			Name:        "input-tag",
@@ -67,8 +67,8 @@ func runCli() (c *cli.App) {
 
 	c.Commands = []cli.Command{
 		{
-			Name:  "run",
-			Usage: "replace the hostname with found/computed values",
+			Name:      "run",
+			Usage:     "replace the hostname with found/computed values",
 			ArgsUsage: " ",
 			Action:    run,
 		},

@@ -4,8 +4,8 @@ var cfg Config
 
 // Config : A type that handles the configuration of the app
 type Config struct {
-	DryRun bool
-	IdLength int
+	DryRun   bool
+	IDLength int
 	InputTag string
 
 	Log struct {
