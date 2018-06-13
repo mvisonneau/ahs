@@ -48,3 +48,29 @@ GLOBAL OPTIONS:
    --help, -h          show help
    --version, -v       print the version
 ```
+
+## Develop
+
+If you have docker locally, you can use the following command in order to quickly get a development env ready: `make dev-env`. You can also have a look onto the [Makefile](/Makefile) in order to see all available options:
+
+```
+~$ make
+all                            Test, builds and ship package for all supported platforms
+build                          Build the binary
+clean                          Remove binary if it exists
+coverage                       Generates coverage report
+deps                           Fetch all dependencies
+dev-env                        Build a local development environment using Docker
+fmt                            Format source code
+help                           Displays this help
+imports                        Fixes the syntax (linting) of the codebase
+install                        Build and install locally the binary (dev purpose)
+lint                           Run golint and go vet against the codebase
+publish-github                 Send the binaries onto the GitHub release
+setup                          Install required libraries/tools
+test                           Run the tests against the codebase
+```
+
+## Contribute
+
+Contributions are more than welcome! Feel free to submit a [PR](https://github.com/mvisonneau/ahs/pulls).
