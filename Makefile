@@ -37,18 +37,9 @@ build: ## Build the binary
 	gox -osarch "linux/386 linux/amd64" -ldflags "$(LDFLAGS)" -output dist/$(NAME)_{{.OS}}_{{.Arch}}
 	strip dist/*
 
-.PHONY: build-docker
-build-docker: ## Build the binary and package it in Docker
-	docker build -t $(REGISTRY):$(VERSION) -t $(REGISTRY):latest .
-
 .PHONY: publish-github
 publish-github: ## Send the binaries onto the GitHub release
 	ghr -u mvisonneau -replace $(VERSION) dist
-
-.PHONY: publish-docker
-publish-docker: ## Send the docker images onto the docker hub
-	docker push $(REGISTRY):$(VERSION)
-	docker push $(REGISTRY):latest
 
 .PHONY: deps
 deps: ## Fetch all dependencies
