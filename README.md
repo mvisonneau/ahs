@@ -9,6 +9,20 @@
 This projects aims to ease the configuration of AWS EC2 instances hostname.
 In particular when they are launched as part of ASGs or fleets.
 
+## TL;DR
+
+```
+~$ wget https://github.com/mvisonneau/ahs/releases/download/0.0.1/ahs_linux_amd64 -O /usr/local/bin/ahs; chmod +x /usr/local/bin/ahs
+~$ ahs run
+INFO[2018-06-13T21:58:12Z] Found instance-id : 'i-07263d49fca824ba5'
+INFO[2018-06-13T21:58:12Z] Found AZ: 'eu-west-1a'
+INFO[2018-06-13T21:58:12Z] Computed region : 'eu-west-1'
+INFO[2018-06-13T21:58:12Z] Found instance name tag : 'myhostname'
+INFO[2018-06-13T21:58:12Z] Computed unique hostname : 'myhostname-07263'
+INFO[2018-06-13T21:58:12Z] Setting instance hostname locally
+INFO[2018-06-13T21:58:12Z] Setting hostname on configured instance tag 'Name'
+```
+
 ## Usage
 
 ```
