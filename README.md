@@ -1,7 +1,13 @@
 # ahs
 
+[![GoDoc](https://godoc.org/github.com/mvisonneau/ahs?status.svg)](https://godoc.org/github.com/mvisonneau/ahs/app)
+[![Go Report Card](https://goreportcard.com/badge/github.com/mvisonneau/ahs)](https://goreportcard.com/report/github.com/mvisonneau/ahs)
+[![Docker Pulls](https://img.shields.io/docker/pulls/mvisonneau/ahs.svg)](https://hub.docker.com/r/mvisonneau/ahs/)
+[![Build Status](https://travis-ci.org/mvisonneau/ahs.svg?branch=master)](https://travis-ci.org/mvisonneau/ahs)
+[![Coverage Status](https://coveralls.io/repos/github/mvisonneau/ahs/badge.svg?branch=master)](https://coveralls.io/github/mvisonneau/ahs?branch=master)
+
 This projects aims to ease the configuration of AWS EC2 instances hostname.
-In particular when they are launched as part of ASGs for fleets.
+In particular when they are launched as part of ASGs or fleets.
 
 ## Usage
 
