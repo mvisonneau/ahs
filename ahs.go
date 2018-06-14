@@ -32,12 +32,14 @@ func run(c *cli.Context) error {
 	if err != nil {
 		return exit(cli.NewExitError(err.Error(), 1))
 	}
+	log.Infof("Found instance-id : '%s'", id)
 
 	log.Debug("Fetching current AZ from MDS API")
 	az, err := getInstanceAZ(mdsClient)
 	if err != nil {
 		return exit(cli.NewExitError(err.Error(), 1))
 	}
+	log.Infof("Found AZ: '%s'", az)
 
 	region := computeRegionFromAZ(az)
 	log.Infof("Computed region : '%s'", region)
@@ -94,10 +96,7 @@ func getAWSEC2Client(region string) (client *ec2.EC2) {
 }
 
 func getInstanceAZ(c *ec2metadata.EC2Metadata) (az string, err error) {
-
 	az, err = c.GetMetadata("placement/availability-zone")
-	log.Infof("Found AZ: '%s'", az)
-
 	return
 }
 
@@ -106,9 +105,7 @@ func computeRegionFromAZ(az string) string {
 }
 
 func getInstanceID(c *ec2metadata.EC2Metadata) (id string, err error) {
-	log.Debug("Querying instance-id from metadata service")
 	id, err = c.GetMetadata("instance-id")
-	log.Infof("Found instance-id : '%s'", id)
 	return
 }
 
