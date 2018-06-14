@@ -62,11 +62,14 @@ func run(c *cli.Context) error {
 			return exit(cli.NewExitError(err.Error(), 1))
 		}
 
-		log.Infof("Setting hostname on configured instance tag '%s'")
+		log.Infof("Setting hostname on configured instance tag '%s'", cfg.OutputTag)
 		err = setOutputTagValue(cfg.OutputTag, hostname, instanceID, ec2Client)
 		if err != nil {
 			return exit(cli.NewExitError(analyzeEC2APIErrors(err), 1))
 		}
+	} else {
+		log.Infof("Setting instance hostname locally (dry-run)")
+		log.Infof("Setting hostname on configured instance tag '%s' (dry-run)", cfg.OutputTag)
 	}
 
 	return exit(nil)

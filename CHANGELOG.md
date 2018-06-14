@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added some tests
 - Added CI config
 
+### BUGFIXES
+- Fixed incorrect log output on output tag value
+
 ## [0.1.0] - 2018-06-13
 ### FEATURES
 - Working state of the app
