@@ -28,7 +28,7 @@ func run(c *cli.Context) error {
 	}
 
 	log.Debug("Fetching current instance-id from MDS API")
-	instanceID, err := getinstanceID(mdsClient)
+	instanceID, err := getInstanceID(mdsClient)
 	if err != nil {
 		return exit(cli.NewExitError(err.Error(), 1))
 	}
@@ -105,7 +105,7 @@ func computeRegionFromAZ(az string) string {
 	return az[:len(az)-1]
 }
 
-func getinstanceID(c *ec2metadata.EC2Metadata) (id string, err error) {
+func getInstanceID(c *ec2metadata.EC2Metadata) (id string, err error) {
 	log.Debug("Querying instance-id from metadata service")
 	id, err = c.GetMetadata("instance-id")
 	log.Infof("Found instance-id : '%s'", id)
