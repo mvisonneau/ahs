@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.0.2] - 2018-06-18
 ### FEATURES
 - Do not keep appending the instance-id when it is already set on the inputTag
 
@@ -16,7 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### BUGFIXES
 - Fixed incorrect log output on output tag value
 
-## [0.1.0] - 2018-06-13
+## [0.0.1] - 2018-06-13
 ### FEATURES
 - Working state of the app
 - Configure hostnames on Unix based OSes
@@ -29,5 +31,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - License
 - Readme
 
-[Unreleased]: https://github.com/mvisonneau/ahs/compare/0.0.1...HEAD
-[0.1.0]: https://github.com/mvisonneau/ahs/tree/0.0.1
+[Unreleased]: https://github.com/mvisonneau/ahs/compare/0.0.2...HEAD
+[0.0.2]: https://github.com/mvisonneau/ahs/tree/0.0.2
+[0.0.1]: https://github.com/mvisonneau/ahs/tree/0.0.1
