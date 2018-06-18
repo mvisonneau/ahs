@@ -9,6 +9,7 @@ LDFLAGS       := -w -extldflags "-static" -X 'main.version=$(VERSION)'
 setup: ## Install required libraries/tools
 	go get -u -v github.com/golang/dep/cmd/dep
 	go get -u -v github.com/golang/lint/golint
+	go get -u -v github.com/mattn/goveralls
 	go get -u -v github.com/mitchellh/gox
 	go get -u -v github.com/tcnksm/ghr
 	go get -u -v golang.org/x/tools/cmd/cover
@@ -44,6 +45,10 @@ publish-github: ## Send the binaries onto the GitHub release
 .PHONY: deps
 deps: ## Fetch all dependencies
 	dep ensure -v
+
+.PHONY: goveralls
+goveralls: ## Push coverage stats on goveralls
+	goveralls -service=travis-ci -coverprofile=coverage.out
 
 .PHONY: imports
 imports: ## Fixes the syntax (linting) of the codebase
