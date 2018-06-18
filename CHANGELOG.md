@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### FEATURES
+- Do not keep appending the instance-id when it is already set on the inputTag
+
 ### ENHANCEMENTS
 - Added some tests
 - Added CI config
