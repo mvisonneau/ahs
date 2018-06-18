@@ -32,7 +32,7 @@ func run(c *cli.Context) error {
 	if err != nil {
 		return exit(cli.NewExitError(err.Error(), 1))
 	}
-	log.Infof("Found instance-id : '%s'", id)
+	log.Infof("Found instance-id : '%s'", instanceID)
 
 	log.Debug("Fetching current AZ from MDS API")
 	az, err := getInstanceAZ(mdsClient)
@@ -54,11 +54,12 @@ func run(c *cli.Context) error {
 	}
 	log.Infof("Found instance name tag : '%s'", inputTagValue)
 
+	var hostname string
 	if inputTagValue[len(inputTagValue)-cfg.IDLength:] == instanceID[2:2+cfg.IDLength] {
-		hostname := inputTagValue
+		hostname = inputTagValue
 		log.Infof("Instance ID already found in the instance tag : '%s', reusing this value", inputTagValue)
 	} else {
-		hostname := computeHostname(inputTagValue, cfg.Separator, instanceID, cfg.IDLength)
+		hostname = computeHostname(inputTagValue, cfg.Separator, instanceID, cfg.IDLength)
 		log.Infof("Computed unique hostname : '%s'", hostname)
 	}
 
