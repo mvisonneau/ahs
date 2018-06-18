@@ -57,7 +57,7 @@ func run(c *cli.Context) error {
 	if inputTagValue[len(inputTagValue)-cfg.IDLength:] == instanceID[2:2+cfg.IDLength] {
 		hostname := inputTagValue
 		log.Infof("Instance ID already found in the instance tag : '%s', reusing this value", inputTagValue)
-  } else {
+	} else {
 		hostname := computeHostname(inputTagValue, cfg.Separator, instanceID, cfg.IDLength)
 		log.Infof("Computed unique hostname : '%s'", hostname)
 	}
