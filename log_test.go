@@ -26,7 +26,7 @@ func TestConfigureLoggingJson(t *testing.T) {
 	err := configureLogging("debug", "json")
 
 	if err != nil {
-		t.Fatalf("Function is not expected to return an error, got '%s'", err.Error() )
+		t.Fatalf("Function is not expected to return an error, got '%s'", err.Error())
 	}
 }
 
