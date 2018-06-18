@@ -21,3 +21,19 @@ func TestConfigureLoggingDefault(t *testing.T) {
 		t.Fatal("Expected function to return an error, got nil")
 	}
 }
+
+func TestConfigureLoggingJson(t *testing.T) {
+	err := configureLogging("debug", "json")
+
+	if err != nil {
+		t.Fatalf("Function is not expected to return an error, got '%s'", err.Error() )
+	}
+}
+
+func TestConfigureLoggingInvalidLogFormat(t *testing.T) {
+	err := configureLogging("foo", "default")
+
+	if err == nil {
+		t.Fatal("Expected function to return an error, got nil")
+	}
+}
