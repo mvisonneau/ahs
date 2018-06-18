@@ -66,7 +66,8 @@ help                           Displays this help
 imports                        Fixes the syntax (linting) of the codebase
 install                        Build and install locally the binary (dev purpose)
 lint                           Run golint and go vet against the codebase
-publish-github                 Send the binaries onto the GitHub release
+publish-github                 Publish the compiled binaries onto the GitHub release API
+publish-goveralls              Publish coverage stats on goveralls
 setup                          Install required libraries/tools
 test                           Run the tests against the codebase
 ```

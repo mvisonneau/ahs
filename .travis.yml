@@ -8,4 +8,4 @@ install:
   - make deps
 script:
   - make all
-  - make goveralls
+  - make publish-goveralls
