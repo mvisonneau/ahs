@@ -13,6 +13,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/ec2"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
+	"gopkg.in/matryer/try.v1"
 )
 
 var start time.Time
@@ -47,8 +48,18 @@ func run(c *cli.Context) error {
 	log.Debug("Starting AWS EC2 API session")
 	ec2Client := getAWSEC2Client(region)
 
-	log.Debugf("Querying Input Tag '%s' from EC2 API", cfg.InputTag)
-	inputTagValue, err := getInputTagValue(cfg.InputTag, instanceID, ec2Client)
+	log.Infof("Querying Input Tag '%s' from EC2 API", cfg.InputTag)
+	var inputTagValue string
+	err = try.Do(func(attempt int) (retry bool, err error) {
+		retry = attempt < 5 // try 5 times
+		inputTagValue, err = getInputTagValue(cfg.InputTag, instanceID, ec2Client)
+		if err != nil {
+			wait := (time.Duration(5*attempt) * time.Second)
+			log.Infof("Tag not found yet, retrying in %v (%d/5)..", wait, attempt)
+			time.Sleep(wait)
+		}
+		return
+	})
 	if err != nil {
 		return exit(cli.NewExitError(analyzeEC2APIErrors(err), 1))
 	}
@@ -116,8 +127,6 @@ func getInstanceID(c *ec2metadata.EC2Metadata) (id string, err error) {
 }
 
 func getInputTagValue(tag string, instanceID string, c *ec2.EC2) (string, error) {
-	log.Debug("Querying instance name tag from EC2 api endpoint")
-
 	tags, err := c.DescribeTags(&ec2.DescribeTagsInput{
 		Filters: []*ec2.Filter{
 			{

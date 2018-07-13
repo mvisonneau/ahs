@@ -2,6 +2,7 @@
 
 
 [[projects]]
+  digest = "1:fce0dc63a07c4d1c0eb3c63916c027877089bad7afe3d2b677eb3e003242e40f"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -31,52 +32,82 @@
     "private/protocol/rest",
     "private/protocol/xml/xmlutil",
     "service/ec2",
-    "service/sts"
+    "service/sts",
   ]
+  pruneopts = "UT"
   revision = "4bdf3e6f6926903b8ca6b0d2b93bbdddcf6af219"
   version = "v1.14.5"
 
 [[projects]]
+  digest = "1:fb46255681497314debedde38b64be32a75bae50bad107586c22f1662bf2d352"
   name = "github.com/go-ini/ini"
   packages = ["."]
+  pruneopts = "UT"
   revision = "06f5f3d67269ccec1fe5fe4134ba6e982984f7f5"
   version = "v1.37.0"
 
 [[projects]]
+  digest = "1:e22af8c7518e1eab6f2eab2b7d7558927f816262586cd6ed9f349c97a6c285c4"
   name = "github.com/jmespath/go-jmespath"
   packages = ["."]
+  pruneopts = "UT"
   revision = "0b12d6b5"
 
 [[projects]]
+  digest = "1:9e9193aa51197513b3abcb108970d831fbcf40ef96aa845c4f03276e1fa316d2"
   name = "github.com/sirupsen/logrus"
   packages = ["."]
+  pruneopts = "UT"
   revision = "c155da19408a8799da419ed3eeb0cb5db0ad5dbc"
   version = "v1.0.5"
 
 [[projects]]
+  digest = "1:b24d38b282bacf9791408a080f606370efa3d364e4b5fd9ba0f7b87786d3b679"
   name = "github.com/urfave/cli"
   packages = ["."]
+  pruneopts = "UT"
   revision = "cfb38830724cc34fedffe9a2a29fb54fa9169cd1"
   version = "v1.20.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:3f3a05ae0b95893d90b9b3b5afdb79a9b3d96e4e36e099d841ae602e4aca0da8"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
+  pruneopts = "UT"
   revision = "8ac0e0d97ce45cd83d1d7243c060cb8461dda5e9"
 
 [[projects]]
   branch = "master"
+  digest = "1:3fabf38439d31a780c4ee493c954033c5b7334c8eea82e9dfa111804a44d7959"
   name = "golang.org/x/sys"
   packages = [
     "unix",
-    "windows"
+    "windows",
   ]
+  pruneopts = "UT"
   revision = "8ee9f3e146b708d082f4bab861e5759d1edf8c00"
+
+[[projects]]
+  digest = "1:cc9f0c72e45707522afc156b3d715443e2021acedff165a4803f72a0d2ed170f"
+  name = "gopkg.in/matryer/try.v1"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "312d2599e12e89ca89b52a09597394f449235d80"
+  version = "v1"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "294c94f09213cf8a7a8174a52af3fa6320e6c7810cf680b3da1c561ed9a25905"
+  input-imports = [
+    "github.com/aws/aws-sdk-go/aws",
+    "github.com/aws/aws-sdk-go/aws/awserr",
+    "github.com/aws/aws-sdk-go/aws/ec2metadata",
+    "github.com/aws/aws-sdk-go/aws/session",
+    "github.com/aws/aws-sdk-go/service/ec2",
+    "github.com/sirupsen/logrus",
+    "github.com/urfave/cli",
+    "gopkg.in/matryer/try.v1",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
