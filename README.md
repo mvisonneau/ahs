@@ -12,7 +12,7 @@ In particular when they are launched as part of ASGs or fleets.
 ## TL;DR
 
 ```
-~$ wget https://github.com/mvisonneau/ahs/releases/download/0.0.2/ahs_linux_amd64 -O /usr/local/bin/ahs; chmod +x /usr/local/bin/ahs
+~$ wget https://github.com/mvisonneau/ahs/releases/download/0.0.3/ahs_linux_amd64 -O /usr/local/bin/ahs; chmod +x /usr/local/bin/ahs
 ~$ ahs run
 INFO[2018-06-13T21:58:12Z] Found instance-id : 'i-07263d49fca824ba5'
 INFO[2018-06-13T21:58:12Z] Found AZ: 'eu-west-1a'
