@@ -13,7 +13,7 @@ make setup
 COPY . .
 RUN \
 make deps ;\
-make build
+make build-docker
 
 ##
 # RELEASE CONTAINER
@@ -23,7 +23,7 @@ FROM scratch
 
 WORKDIR /
 
-COPY --from=builder /go/src/github.com/mvisonneau/ahs /
+COPY --from=builder /go/src/github.com/mvisonneau/ahs/ahs /
 
 ENTRYPOINT ["/ahs"]
 CMD [""]

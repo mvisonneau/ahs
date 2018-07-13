@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### BUGFIXES
 - Boot issues when the tag is not available through the API yet [GH-1]
+- Fixed the Dockerized version, also updated doc
 
 ### ENHANCEMENTS
 - Updated dependencies to latest version and removed some constraints

@@ -14,6 +14,11 @@ build: ## Build the binary
 	CGO_ENABLED=0 gox -osarch "linux/386 linux/amd64" -ldflags "$(LDFLAGS)" -output dist/$(NAME)_{{.OS}}_{{.Arch}}
 	strip dist/*
 
+.PHONY: build-docker
+build-docker:
+	CGO_ENABLED=0 go build -ldflags "$(LDFLAGS)" .
+	strip $(NAME)
+
 .PHONY: clean
 clean: ## Remove binary if it exists
 	rm -f $(NAME)

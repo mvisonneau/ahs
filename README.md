@@ -24,6 +24,12 @@ INFO[2018-06-13T21:58:12Z] Setting instance hostname locally
 INFO[2018-06-13T21:58:12Z] Setting hostname on configured instance tag 'Name'
 ```
 
+You can also use a *Dockerized version* if you prefer :
+
+```
+~$ docker run -it --rm --privileged mvisonneau/ahs run
+```
+
 ## Usage
 
 ```
