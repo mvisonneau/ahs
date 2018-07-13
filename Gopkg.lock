@@ -2,7 +2,7 @@
 
 
 [[projects]]
-  digest = "1:fce0dc63a07c4d1c0eb3c63916c027877089bad7afe3d2b677eb3e003242e40f"
+  digest = "1:2c22e10da65875723ed3ab30102dde32673460a450571c48232fb5e63b02e0bb"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -24,6 +24,7 @@
     "aws/signer/v4",
     "internal/sdkio",
     "internal/sdkrand",
+    "internal/sdkuri",
     "internal/shareddefaults",
     "private/protocol",
     "private/protocol/ec2query",
@@ -35,16 +36,16 @@
     "service/sts",
   ]
   pruneopts = "UT"
-  revision = "4bdf3e6f6926903b8ca6b0d2b93bbdddcf6af219"
-  version = "v1.14.5"
+  revision = "9e9afa0895e9daff556cc18f90dc53eb91f41ffd"
+  version = "v1.14.26"
 
 [[projects]]
-  digest = "1:fb46255681497314debedde38b64be32a75bae50bad107586c22f1662bf2d352"
+  digest = "1:fe8a03a8222d5b913f256972933d26d24ad7c8286692a42943bc01633cc8fce3"
   name = "github.com/go-ini/ini"
   packages = ["."]
   pruneopts = "UT"
-  revision = "06f5f3d67269ccec1fe5fe4134ba6e982984f7f5"
-  version = "v1.37.0"
+  revision = "358ee7663966325963d4e8b2e1fbd570c5195153"
+  version = "v1.38.1"
 
 [[projects]]
   digest = "1:e22af8c7518e1eab6f2eab2b7d7558927f816262586cd6ed9f349c97a6c285c4"
@@ -75,18 +76,18 @@
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
   pruneopts = "UT"
-  revision = "8ac0e0d97ce45cd83d1d7243c060cb8461dda5e9"
+  revision = "a49355c7e3f8fe157a85be2f77e6e269a0f89602"
 
 [[projects]]
   branch = "master"
-  digest = "1:3fabf38439d31a780c4ee493c954033c5b7334c8eea82e9dfa111804a44d7959"
+  digest = "1:72d6244a51be9611f08994aca19677fcc31676b3e7b742c37e129e6ece4ad8fc"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "8ee9f3e146b708d082f4bab861e5759d1edf8c00"
+  revision = "1b2967e3c290b7c545b3db0deeda16e9be4f98a2"
 
 [[projects]]
   digest = "1:cc9f0c72e45707522afc156b3d715443e2021acedff165a4803f72a0d2ed170f"

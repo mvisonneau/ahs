@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### BUGFIXES
-- Boot issues when the tag is not available through the API yet.
+- Boot issues when the tag is not available through the API yet [GH-1]
+
+### ENHANCEMENTS
+- Updated dependencies to latest version and removed some constraints
 
 ## [0.0.2] - 2018-06-18
 ### FEATURES
