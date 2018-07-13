@@ -11,7 +11,7 @@ all: lint imports test coverage build ## Test, builds and ship package for all s
 .PHONY: build
 build: ## Build the binary
 	mkdir -p dist; rm -rf dist/*
-	gox -osarch "linux/386 linux/amd64" -ldflags "$(LDFLAGS)" -output dist/$(NAME)_{{.OS}}_{{.Arch}}
+	CGO_ENABLED=0 gox -osarch "linux/386 linux/amd64" -ldflags "$(LDFLAGS)" -output dist/$(NAME)_{{.OS}}_{{.Arch}}
 	strip dist/*
 
 .PHONY: clean
@@ -46,7 +46,6 @@ imports: ## Fixes the syntax (linting) of the codebase
 .PHONY: install
 install: ## Build and install locally the binary (dev purpose)
 	go install .
-
 
 .PHONY: lint
 lint: ## Run golint and go vet against the codebase

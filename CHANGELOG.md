@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### ENHANCEMENTS
 - Updated dependencies to latest version and removed some constraints
+- Disabled CGO on build function
 
 ## [0.0.2] - 2018-06-18
 ### FEATURES
