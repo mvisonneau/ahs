@@ -17,6 +17,7 @@ In particular when they are launched as part of ASGs or fleets.
 INFO[2018-06-13T21:58:12Z] Found instance-id : 'i-07263d49fca824ba5'
 INFO[2018-06-13T21:58:12Z] Found AZ: 'eu-west-1a'
 INFO[2018-06-13T21:58:12Z] Computed region : 'eu-west-1'
+INFO[2018-06-13T21:58:12Z] Querying Input Tag 'Name' from EC2 API
 INFO[2018-06-13T21:58:12Z] Found instance name tag : 'myhostname'
 INFO[2018-06-13T21:58:12Z] Computed unique hostname : 'myhostname-07263'
 INFO[2018-06-13T21:58:12Z] Setting instance hostname locally
