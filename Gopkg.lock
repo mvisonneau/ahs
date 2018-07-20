@@ -55,6 +55,14 @@
   revision = "0b12d6b5"
 
 [[projects]]
+  digest = "1:b6bbd2f9e0724bd81890c8644259f920c6d61c08453978faff0bebd25f3e7d3e"
+  name = "github.com/jpillora/backoff"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "8eab2debe79d12b7bd3d10653910df25fa9552ba"
+  version = "1.0.0"
+
+[[projects]]
   digest = "1:9e9193aa51197513b3abcb108970d831fbcf40ef96aa845c4f03276e1fa316d2"
   name = "github.com/sirupsen/logrus"
   packages = ["."]
@@ -89,14 +97,6 @@
   pruneopts = "UT"
   revision = "ac767d655b305d4e9612f5f6e33120b9176c4ad4"
 
-[[projects]]
-  digest = "1:cc9f0c72e45707522afc156b3d715443e2021acedff165a4803f72a0d2ed170f"
-  name = "gopkg.in/matryer/try.v1"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "312d2599e12e89ca89b52a09597394f449235d80"
-  version = "v1"
-
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
@@ -106,9 +106,9 @@
     "github.com/aws/aws-sdk-go/aws/ec2metadata",
     "github.com/aws/aws-sdk-go/aws/session",
     "github.com/aws/aws-sdk-go/service/ec2",
+    "github.com/jpillora/backoff",
     "github.com/sirupsen/logrus",
     "github.com/urfave/cli",
-    "gopkg.in/matryer/try.v1",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

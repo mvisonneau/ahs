@@ -11,9 +11,9 @@ import (
 	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/jpillora/backoff"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
-	"gopkg.in/matryer/try.v1"
 )
 
 var start time.Time
@@ -49,20 +49,30 @@ func run(c *cli.Context) error {
 	ec2Client := getAWSEC2Client(region)
 
 	log.Infof("Querying Input Tag '%s' from EC2 API", cfg.InputTag)
+
+	b := &backoff.Backoff{
+		Min:    100 * time.Millisecond,
+		Max:    120 * time.Second,
+		Factor: 2,
+		Jitter: false,
+	}
+
 	var inputTagValue string
-	err = try.Do(func(attempt int) (retry bool, err error) {
-		retry = attempt < 5 // try 5 times
+	for {
 		inputTagValue, err = getInputTagValue(cfg.InputTag, instanceID, ec2Client)
 		if err != nil {
-			wait := (time.Duration(5*attempt) * time.Second)
-			log.Infof("Tag not found yet, retrying in %v (%d/5)..", wait, attempt)
-			time.Sleep(wait)
+			d := b.Duration()
+			if d == 60 * time.Second {
+				return exit(cli.NewExitError(analyzeEC2APIErrors(err), 1))
+			} else {
+				log.Infof("Error retrieving the tag : '%s', retrying in %s", analyzeEC2APIErrors(err), d)
+				time.Sleep(d)
+			}
+		} else {
+			break
 		}
-		return
-	})
-	if err != nil {
-		return exit(cli.NewExitError(analyzeEC2APIErrors(err), 1))
 	}
+
 	log.Infof("Found instance name tag : '%s'", inputTagValue)
 
 	var hostname string
