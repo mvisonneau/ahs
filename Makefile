@@ -32,6 +32,10 @@ coverage: ## Generates coverage report
 deps: ## Fetch all dependencies
 	dep ensure -v
 
+.PHONY: deps-update
+deps-update: ## Update all dependencies
+	dep ensure -update -v
+
 .PHONY: dev-env
 dev-env: ## Build a local development environment using Docker
 	@docker run -it --rm \

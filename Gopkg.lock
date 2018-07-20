@@ -2,7 +2,7 @@
 
 
 [[projects]]
-  digest = "1:2c22e10da65875723ed3ab30102dde32673460a450571c48232fb5e63b02e0bb"
+  digest = "1:0a716f9eeca2c799b5f0ae48ba8f79b44d8c7ecff98b98c55e2f85f6fb68ce65"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -36,8 +36,8 @@
     "service/sts",
   ]
   pruneopts = "UT"
-  revision = "9e9afa0895e9daff556cc18f90dc53eb91f41ffd"
-  version = "v1.14.26"
+  revision = "bc3f534c19ffdf835e524e11f0f825b3eaf541c3"
+  version = "v1.14.31"
 
 [[projects]]
   digest = "1:fe8a03a8222d5b913f256972933d26d24ad7c8286692a42943bc01633cc8fce3"
@@ -76,7 +76,7 @@
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
   pruneopts = "UT"
-  revision = "a49355c7e3f8fe157a85be2f77e6e269a0f89602"
+  revision = "a2144134853fc9a27a7b1e3eb4f19f1a76df13c9"
 
 [[projects]]
   branch = "master"
@@ -87,7 +87,7 @@
     "windows",
   ]
   pruneopts = "UT"
-  revision = "1b2967e3c290b7c545b3db0deeda16e9be4f98a2"
+  revision = "ac767d655b305d4e9612f5f6e33120b9176c4ad4"
 
 [[projects]]
   digest = "1:cc9f0c72e45707522afc156b3d715443e2021acedff165a4803f72a0d2ed170f"
