@@ -398,6 +398,14 @@ func (c *Clients) findAvailableNumberInInstanceGroup(instanceGroup, groupTag, se
 							return -1, err
 						}
 
+						// Check if the sequential is not already existent and warn about it
+						for i := 0; i < len(used); i++ {
+							if used[i] == v {
+								log.Warnf("Found another running instance '%s' with tag '%s' and already found sequential id '%d'!, skipping it for the count", *instance.InstanceId, groupTag, v)
+								continue
+							}
+						}
+
 						used = append(used, v)
 						log.Debugf("Found running instance '%s' with tag '%s' and sequential id '%d'", *instance.InstanceId, groupTag, v)
 					}

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### BUGFIXES
 - Fixed the `dry-run` function
 - Filter on running instances only for the **sequential** method
+- Avoid duplicates when looking for sequential ids which breaks the compute function
 
 ## [0.1.0] - 2018-07-23
 ### FEATURES
