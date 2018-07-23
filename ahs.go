@@ -23,7 +23,7 @@ import (
 
 // Params of the app
 type Params struct {
-	Backoff *backoff.Backoff
+	Backoff   *backoff.Backoff
 	InputTag  string
 	OutputTag string
 	Separator string
@@ -125,7 +125,7 @@ func run(ctx *cli.Context) error {
 		v.Base, err = c.getBaseFromInputTag(p.InputTag, v.InstanceID)
 		if err != nil {
 			d := p.Backoff.Duration()
-			if d == 60 * time.Second {
+			if d == 60*time.Second {
 				return exit(cli.NewExitError(analyzeEC2APIErrors(err), 1))
 			}
 			log.Infof("%s, retrying in %s", analyzeEC2APIErrors(err), d)
@@ -149,7 +149,7 @@ func run(ctx *cli.Context) error {
 		return exit(cli.NewExitError(err.Error(), 1))
 	}
 
-	if !ctx.Bool("dry-run") {
+	if !ctx.GlobalBool("dry-run") {
 		log.Infof("Setting instance hostname locally")
 		if err := setSystemHostname(v.Hostname); err != nil {
 			return exit(cli.NewExitError(err.Error(), 1))
