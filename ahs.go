@@ -390,15 +390,17 @@ func (c *Clients) findAvailableNumberInInstanceGroup(instanceGroup, groupTag, se
 	var used []int
 	for _, reservation := range instances.Reservations {
 		for _, instance := range reservation.Instances {
-			for _, tag := range instance.Tags {
-				if *tag.Key == sequentialIDTag {
-					v, err := strconv.Atoi(*tag.Value)
-					if err != nil {
-						return -1, err
-					}
+			if *instance.State.Name == "running" {
+				for _, tag := range instance.Tags {
+					if *tag.Key == sequentialIDTag {
+						v, err := strconv.Atoi(*tag.Value)
+						if err != nil {
+							return -1, err
+						}
 
-					used = append(used, v)
-					log.Debugf("Found instance '%s' with tag '%s' and sequential id '%d'", *instance.InstanceId, groupTag, v)
+						used = append(used, v)
+						log.Debugf("Found running instance '%s' with tag '%s' and sequential id '%d'", *instance.InstanceId, groupTag, v)
+					}
 				}
 			}
 		}
