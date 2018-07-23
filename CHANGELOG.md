@@ -7,13 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.1.0] - 2018-07-23
 ### FEATURES
 - New **sequential** hostname calculation method
 - Ensure that we are running as **root**
 
 ### ENHANCEMENTS
 - Refactored the codebase and added more parameters
-- Removed the requirements of `try` or `backoff` libraries
 - Updated all deps to most recent version
 
 ## [0.0.3] - 2018-07-13
@@ -49,7 +49,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - License
 - Readme
 
-[Unreleased]: https://github.com/mvisonneau/ahs/compare/0.0.3...HEAD
+[Unreleased]: https://github.com/mvisonneau/ahs/compare/0.1.0...HEAD
+[0.1.0]: https://github.com/mvisonneau/ahs/tree/0.1.0
 [0.0.3]: https://github.com/mvisonneau/ahs/tree/0.0.3
 [0.0.2]: https://github.com/mvisonneau/ahs/tree/0.0.2
 [0.0.1]: https://github.com/mvisonneau/ahs/tree/0.0.1
