@@ -13,21 +13,35 @@ In particular when they are launched as part of ASGs or fleets.
 
 ```
 ~$ wget https://github.com/mvisonneau/ahs/releases/download/0.0.3/ahs_linux_amd64 -O /usr/local/bin/ahs; chmod +x /usr/local/bin/ahs
-~$ ahs run
-INFO[2018-06-13T21:58:12Z] Found instance-id : 'i-07263d49fca824ba5'
-INFO[2018-06-13T21:58:12Z] Found AZ: 'eu-west-1a'
-INFO[2018-06-13T21:58:12Z] Computed region : 'eu-west-1'
-INFO[2018-06-13T21:58:12Z] Querying Input Tag 'Name' from EC2 API
-INFO[2018-06-13T21:58:12Z] Found instance name tag : 'myhostname'
-INFO[2018-06-13T21:58:12Z] Computed unique hostname : 'myhostname-07263'
-INFO[2018-06-13T21:58:12Z] Setting instance hostname locally
-INFO[2018-06-13T21:58:12Z] Setting hostname on configured instance tag 'Name'
+
+# Using instance-id method
+~$ ahs instance-id
+INFO[2018-07-23T11:56:00Z] Found AZ: 'eu-west-1a'
+INFO[2018-07-23T11:56:00Z] Computed region : 'eu-west-1'
+INFO[2018-07-23T11:56:00Z] Found instance-id : 'i-096bed3161783f000'
+INFO[2018-07-23T11:56:00Z] Querying input-tag 'Name' from EC2 API
+INFO[2018-07-23T11:56:00Z] Computing hostname with truncated instance-id
+INFO[2018-07-23T11:56:00Z] Computed unique hostname : 'myhostname-096be'
+INFO[2018-07-23T11:56:00Z] Setting instance hostname locally
+INFO[2018-07-23T11:56:00Z] Setting hostname on configured instance output tag 'Name'
+
+# Using sequential method
+~$ ahs sequential
+INFO[2018-07-23T11:56:00Z] Found AZ: 'eu-west-1a'
+INFO[2018-07-23T11:56:00Z] Computed region : 'eu-west-1'
+INFO[2018-07-23T11:56:00Z] Found instance-id : 'i-096bed3161783f000'
+INFO[2018-07-23T11:56:00Z] Querying input-tag 'Name' from EC2 API
+INFO[2018-07-23T11:56:00Z] Computing a hostname with sequential naming
+INFO[2018-07-23T11:56:00Z] Computed unique hostname : 'myhostname-1' - Sequential ID : '1'
+INFO[2018-07-23T11:56:00Z] Setting instance hostname locally
+INFO[2018-07-23T11:56:00Z] Setting hostname on configured instance output tag 'Name'
+INFO[2018-07-23T11:56:00Z] Setting instance sequential id (1) on configured tag 'ahs:instance-id'
 ```
 
 You can also use a *Dockerized version* if you prefer :
 
 ```
-~$ docker run -it --rm --privileged mvisonneau/ahs run
+~$ docker run -it --rm --privileged mvisonneau/ahs <instance-id|sequential>
 ```
 
 ## Usage
@@ -40,20 +54,56 @@ NAME:
 USAGE:
    ahs [global options] command [command options] [arguments...]
 
+VERSION:
+   <devel>
+
 COMMANDS:
-     run      replace the hostname with found/computed values
-     help, h  Shows a list of commands or help for one command
+     instance-id  compute a hostname by appending the instance-id to a prefixed/base string
+     sequential   compute a sequential hostname based on the number of instances belonging to the same group
+     help, h      Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --dry-run           only display what would have been done [$AHS_DRY_RUN]
-   --id-length value   length of the id to keep in the hostname (default: 5) [$AHS_ID_LENGTH]
-   --input-tag value   tag to use as input to determine the hostname (default: "Name") [$AHS_TAG_NAME_INPUT]
-   --log-level value   log level (debug,info,warn,fatal,panic) (default: "info") [$AHS_LOG_LEVEL]
-   --log-format value  log format (json,text) (default: "text") [$AHS_LOG_FORMAT]
-   --output-tag value  tag to update with the computed hostname (default: "Name") [$AHS_TAG_NAME_OUTPUT]
-   --separator value   separator to use between tag and id (default: "-") [$AHS_SEPARATOR]
-   --help, -h          show help
-   --version, -v       print the version
+   --dry-run              only display what would have been done [$AHS_DRY_RUN]
+   --input-tag tag        tag to use as input to determine the hostname (default: "Name") [$AHS_INPUT_TAG]
+   --log-level level      log level (debug,info,warn,fatal,panic) (default: "info") [$AHS_LOG_LEVEL]
+   --log-format format    log format (json,text) (default: "text") [$AHS_LOG_FORMAT]
+   --output-tag tag       tag to update with the computed hostname (default: "Name") [$AHS_OUTPUT_TAG]
+   --separator separator  separator to use between tag and id (default: "-") [$AHS_SEPARATOR]
+   --help, -h             show help
+   --version, -v          print the version
+```
+
+### InstanceID method
+
+This method basically takes the output of a tag considered as the `base` of the hostname, it appends a separator to it (default to `-`) and finally a truncated value of the instance-id (default to `5 characters`).
+
+```
+~$ ahs instance-id -h
+NAME:
+   ahs instance-id - compute a hostname by appending the instance-id to a prefixed/base string
+
+USAGE:
+   ahs instance-id [command options]
+
+OPTIONS:
+   --length value  length of the id to keep in the hostname (default: 5) [$AHS_INSTANCE_ID_LENGTH]
+```
+
+### Sequential method
+
+This method allows you to have sequential hostnames on instances on which you couldn't or haven't configured at the time of provisioning.
+
+```
+~$ ahs sequential -h
+NAME:
+   ahs sequential - compute a sequential hostname based on the number of instances belonging to the same group
+
+USAGE:
+   ahs sequential [command options]
+
+OPTIONS:
+   --instance-sequential-id-tag value  tag to which output the computed instance-sequential-id (default: "ahs:instance-id") [$AHS_INSTANCE_SEQUENTIAL_ID_TAG]
+   --instance-group-tag value          tag to use in order to determine which group the instance belongs to (default: "ahs:instance-group") [$AHS_INSTANCE_GROUP_TAG]
 ```
 
 ## Develop

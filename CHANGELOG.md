@@ -7,8 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### FEATURES
+- New **sequential** hostname calculation method
+- Ensure that we are running as **root**
+
 ### ENHANCEMENTS
-- Replaced `try` library with `backoff`
+- Refactored the codebase and added more parameters
+- Removed the requirements of `try` or `backoff` libraries
 - Updated all deps to most recent version
 
 ## [0.0.3] - 2018-07-13

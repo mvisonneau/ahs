@@ -1,14 +1,24 @@
 package main
 
 import (
-	"errors"
+	"fmt"
 	"os"
 
 	log "github.com/sirupsen/logrus"
 )
 
-func configureLogging(level string, format string) error {
-	parsedLevel, _ := log.ParseLevel(level)
+// Logger config
+type Logger struct {
+	Level  string
+	Format string
+}
+
+// Configure the logger
+func (l *Logger) Configure() error {
+	parsedLevel, err := log.ParseLevel(l.Level)
+	if err != nil {
+		return err
+	}
 	log.SetLevel(parsedLevel)
 
 	formatter := &log.TextFormatter{
@@ -16,12 +26,12 @@ func configureLogging(level string, format string) error {
 	}
 	log.SetFormatter(formatter)
 
-	switch format {
+	switch l.Format {
 	case "text":
 	case "json":
 		log.SetFormatter(&log.JSONFormatter{})
 	default:
-		return errors.New("Invalid log format")
+		return fmt.Errorf("Invalid log format '%s'", l.Format)
 	}
 
 	log.SetOutput(os.Stdout)

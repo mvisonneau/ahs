@@ -16,17 +16,41 @@ func TestAnalyzeEC2APIErrors(t *testing.T) {
 	}
 }
 
-func TestComputeHostname(t *testing.T) {
-	hostname := computeHostname("myhostname", "-", "i-123456789", 5)
+func TestComputeHostnameWithInstanceID(t *testing.T) {
+	hostname, err := computeHostnameWithInstanceID("myhostname", "i-123456789", "-", 5)
+	if err != nil {
+		t.Fatalf("Shouldn't have returned any error, got : '%s'", err.Error())
+	}
+
+	if hostname != "myhostname-12345" {
+		t.Fatalf("Should have retreived myhostname-12345, got '%s'", hostname)
+	}
+
+	hostname, err = computeHostnameWithInstanceID("myhostname-12345", "i-123456789", "-", 5)
+	if err != nil {
+		t.Fatalf("Shouldn't have returned any error, got : '%s'", err.Error())
+	}
+
 	if hostname != "myhostname-12345" {
 		t.Fatalf("Should have retreived myhostname-12345, got '%s'", hostname)
 	}
 }
 
-func TestComputeRegionFromAZ(t *testing.T) {
-	region := computeRegionFromAZ("eu-west-1a")
+func TestValidComputeRegionFromAZ(t *testing.T) {
+	region, err := computeRegionFromAZ("eu-west-1a")
+	if err != nil {
+		t.Fatalf("Shouldn't have returned any error, got : '%s'", err.Error())
+	}
+
 	if region != "eu-west-1" {
 		t.Fatalf("Should have retreived eu-west-1, got '%s'", region)
+	}
+}
+
+func TestInvalidComputeRegionFromAZ(t *testing.T) {
+	_, err := computeRegionFromAZ("foo")
+	if err == nil {
+		t.Fatal("Should have thrown an error, got nil")
 	}
 }
 
