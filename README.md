@@ -104,6 +104,7 @@ USAGE:
 OPTIONS:
    --instance-sequential-id-tag value  tag to which output the computed instance-sequential-id (default: "ahs:instance-id") [$AHS_INSTANCE_SEQUENTIAL_ID_TAG]
    --instance-group-tag value          tag to use in order to determine which group the instance belongs to (default: "ahs:instance-group") [$AHS_INSTANCE_GROUP_TAG]
+   --respect-azs                       if instances are provisioned through an ASG, setting this flag it will get the sequential-ids associated to respective azs [$AHS_RESPECT_AZS]
 ```
 
 ## Develop

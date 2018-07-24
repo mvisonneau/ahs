@@ -15,6 +15,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/autoscaling"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/jpillora/backoff"
 	log "github.com/sirupsen/logrus"
@@ -31,8 +32,9 @@ type Params struct {
 
 // Clients of AWS libs
 type Clients struct {
-	EC2 *ec2.EC2
-	MDS *ec2metadata.EC2Metadata
+	Autoscaling *autoscaling.AutoScaling
+	EC2         *ec2.EC2
+	MDS         *ec2metadata.EC2Metadata
 }
 
 // Values computed/generated
@@ -138,9 +140,30 @@ func run(ctx *cli.Context) error {
 
 	switch ctx.Command.FullName() {
 	case "instance-id":
-		v.Hostname, err = computeHostnameWithInstanceID(v.Base, v.InstanceID, p.Separator, ctx.Int("length"))
+		v.Hostname, err = computeHostnameWithInstanceID(v.Base, p.Separator, v.InstanceID, ctx.Int("length"))
 	case "sequential":
-		v.Hostname, v.SequentialID, err = c.computeSequentialHostname(v.Base, v.InstanceID, p.Separator, ctx.String("instance-group-tag"), ctx.String("instance-sequential-id-tag"))
+		instanceGroup, err := c.findInstanceGroupTagValue(ctx.String("instance-group-tag"), v.InstanceID)
+		if err != nil {
+			return exit(cli.NewExitError(analyzeEC2APIErrors(err), 1))
+		}
+
+		if !ctx.Bool("respect-azs") {
+			v.SequentialID, err = c.findAvailableSequentialIDPerRegion(instanceGroup, ctx.String("instance-group-tag"), ctx.String("instance-sequential-id-tag"))
+			if err != nil {
+				return exit(cli.NewExitError(analyzeEC2APIErrors(err), 1))
+			}
+		} else {
+			// Configure Autoscaling Client
+			if err := c.getAWSAutoscalingClient(v.Region); err != nil {
+				return exit(cli.NewExitError(analyzeEC2APIErrors(err), 1))
+			}
+
+			v.SequentialID, err = c.findAvailableSequentialIDPerAZ(v.AZ, instanceGroup, ctx.String("instance-group-tag"), ctx.String("instance-sequential-id-tag"))
+			if err != nil {
+				return exit(cli.NewExitError(analyzeEC2APIErrors(err), 1))
+			}
+		}
+		v.Hostname, err = computeSequentialHostname(v.Base, p.Separator, v.SequentialID)
 	default:
 		return exit(cli.NewExitError(fmt.Sprintf("Function %v is not implemented", ctx.Command.FullName()), 1))
 	}
@@ -196,6 +219,19 @@ func (c *Clients) getAWSEC2Client(region string) (err error) {
 
 	log.Debug("Starting AWS EC2 Client session")
 	c.EC2 = ec2.New(session.New(&aws.Config{
+		Region: aws.String(region),
+	}))
+	return
+}
+
+func (c *Clients) getAWSAutoscalingClient(region string) (err error) {
+	re := regexp.MustCompile("[a-z]{2}-[a-z]+-\\d")
+	if !re.MatchString(region) {
+		return fmt.Errorf("Cannot start AWS Autoscaling client session with invalid region '%s'", region)
+	}
+
+	log.Debug("Starting AWS EC2 Client session")
+	c.Autoscaling = autoscaling.New(session.New(&aws.Config{
 		Region: aws.String(region),
 	}))
 	return
@@ -292,7 +328,7 @@ func (c *Clients) setTagValue(instanceID, tag, value string) (err error) {
 	return
 }
 
-func computeHostnameWithInstanceID(base, instanceID, separator string, length int) (string, error) {
+func computeHostnameWithInstanceID(base, separator, instanceID string, length int) (string, error) {
 	log.Info("Computing hostname with truncated instance-id")
 
 	if base[len(base)-length:] == instanceID[2:2+length] {
@@ -306,31 +342,18 @@ func computeHostnameWithInstanceID(base, instanceID, separator string, length in
 	return hostname, nil
 }
 
-func (c *Clients) computeSequentialHostname(base, instanceID, separator, groupTag, sequentialIDTag string) (string, int, error) {
+func computeSequentialHostname(base, separator string, sequentialID int) (string, error) {
 	log.Info("Computing a hostname with sequential naming")
 
 	re := regexp.MustCompile(".*-(\\d+)$")
 	if re.MatchString(base) {
-		sequentialID, err := strconv.Atoi(re.FindStringSubmatch(base)[1])
-		log.Infof("Current input tag value already matches '.*-\\d+$', keeping '%s' as hostname, '%d' as sequentialID", base, sequentialID)
-
-		return base, sequentialID, err
-	}
-
-	instanceGroup, err := c.findInstanceGroupTagValue(groupTag, instanceID)
-	if err != nil {
-		return "", -1, err
-	}
-
-	sequentialID, err := c.findAvailableNumberInInstanceGroup(instanceGroup, groupTag, sequentialIDTag)
-	if err != nil {
-		return "", -1, err
+		log.Infof("Current input tag value already matches '.*-\\d+$', keeping '%s' as hostname", base)
+		return base, nil
 	}
 
 	hostname := base + separator + strconv.Itoa(sequentialID)
-	log.Infof("Computed unique hostname : '%s' - Sequential ID : '%d'", hostname, sequentialID)
-
-	return hostname, sequentialID, nil
+	log.Infof("Computed unique hostname : '%s'", hostname)
+	return hostname, nil
 }
 
 func (c *Clients) findInstanceGroupTagValue(groupTag, instanceID string) (string, error) {
@@ -370,8 +393,26 @@ func (c *Clients) findInstanceGroupTagValue(groupTag, instanceID string) (string
 	return *tags.Tags[0].Value, nil
 }
 
-func (c *Clients) findAvailableNumberInInstanceGroup(instanceGroup, groupTag, sequentialIDTag string) (int, error) {
-	log.Debugf("Looking up instances that belong to the same group")
+func (c *Clients) findAZsFromASG(asgName string) ([]*string, error) {
+	log.Debugf("Searching configured AZs for ASG '%s'", asgName)
+	asgs, err := c.Autoscaling.DescribeAutoScalingGroups(&autoscaling.DescribeAutoScalingGroupsInput{
+		AutoScalingGroupNames: []*string{&asgName},
+	})
+
+	if err != nil {
+		return []*string{}, err
+	}
+
+	if len(asgs.AutoScalingGroups) != 1 {
+		return []*string{}, fmt.Errorf("Unexpected amount of asgs retrieved : '%d',  expected 1", len(asgs.AutoScalingGroups))
+	}
+
+	log.Debugf("Found '%d' AZ(s)", len(asgs.AutoScalingGroups[0].AvailabilityZones))
+	return asgs.AutoScalingGroups[0].AvailabilityZones, nil
+}
+
+func (c *Clients) findAvailableSequentialIDPerRegion(instanceGroup, groupTag, sequentialIDTag string) (int, error) {
+	log.Debugf("Looking up instances that belong to the same group within the region")
 	instances, err := c.EC2.DescribeInstances(&ec2.DescribeInstancesInput{
 		Filters: []*ec2.Filter{
 			{
@@ -387,6 +428,42 @@ func (c *Clients) findAvailableNumberInInstanceGroup(instanceGroup, groupTag, se
 		return -1, err
 	}
 
+	return computeMostAdequateSequentialID(instances, sequentialIDTag, 1)
+}
+
+func (c *Clients) findAvailableSequentialIDPerAZ(instanceAZ, instanceGroup, groupTag, sequentialIDTag string) (int, error) {
+	log.Debugf("Looking up how many AZs are configured on the ASG")
+	azs, err := c.findAZsFromASG(instanceGroup)
+	if err != nil {
+		return -1, err
+	}
+
+	log.Debugf("Looking up instances that belong to the same group within the AZ (%s)", instanceAZ)
+	instances, err := c.EC2.DescribeInstances(&ec2.DescribeInstancesInput{
+		Filters: []*ec2.Filter{
+			{
+				Name: aws.String("availability-zone"),
+				Values: []*string{
+					aws.String(instanceAZ),
+				},
+			},
+			{
+				Name: aws.String("tag:" + groupTag),
+				Values: []*string{
+					aws.String(instanceGroup),
+				},
+			},
+		},
+	})
+
+	if err != nil {
+		return -1, err
+	}
+
+	return computeMostAdequateSequentialID(instances, sequentialIDTag, len(azs))
+}
+
+func computeMostAdequateSequentialID(instances *ec2.DescribeInstancesOutput, sequentialIDTag string, modulo int) (int, error) {
 	var used []int
 	for _, reservation := range instances.Reservations {
 		for _, instance := range reservation.Instances {
@@ -398,16 +475,15 @@ func (c *Clients) findAvailableNumberInInstanceGroup(instanceGroup, groupTag, se
 							return -1, err
 						}
 
-						// Check if the sequential is not already existent and warn about it
 						for i := 0; i < len(used); i++ {
 							if used[i] == v {
-								log.Warnf("Found another running instance '%s' with tag '%s' and already found sequential id '%d'!, skipping it for the count", *instance.InstanceId, groupTag, v)
+								log.Warnf("Found another running instance '%s' with sequential id '%d'!, skipping it for the count", *instance.InstanceId, v)
 								continue
 							}
 						}
 
 						used = append(used, v)
-						log.Debugf("Found running instance '%s' with tag '%s' and sequential id '%d'", *instance.InstanceId, groupTag, v)
+						log.Debugf("Found running instance '%s' with sequential id '%d' ", *instance.InstanceId, v)
 					}
 				}
 			}
@@ -416,12 +492,11 @@ func (c *Clients) findAvailableNumberInInstanceGroup(instanceGroup, groupTag, se
 
 	sort.Ints(used)
 	for i := 0; i < len(used); i++ {
-		if used[i] != i+1 {
-			return i + 1, nil
+		if used[i] != (i+1)*modulo {
+			return (i + 1) * modulo, nil
 		}
 	}
-
-	return len(used) + 1, nil
+	return (len(used) + 1) * modulo, nil
 }
 
 func exit(err error) error {
