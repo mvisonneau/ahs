@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### FEATURES
 - Added a new flag `--respect-azs` for `sequential` method that ensure we keep sequential ids aligned with configured ASG AZs.
 
+### ENHANCEMENTS
+- Some coverage tweaks/cleanup
+
 ## [0.1.1] - 2018-07-23
 ### BUGFIXES
 - Fixed the `dry-run` function

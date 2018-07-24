@@ -27,6 +27,7 @@ clean: ## Remove binary if it exists
 coverage: ## Generates coverage report
 	rm -rf *.out
 	go test -coverprofile=coverage.out
+	go tool cover -func=coverage.out
 
 .PHONY: deps
 deps: ## Fetch all dependencies
