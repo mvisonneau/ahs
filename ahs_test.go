@@ -17,7 +17,7 @@ func TestAnalyzeEC2APIErrors(t *testing.T) {
 }
 
 func TestComputeHostnameWithInstanceID(t *testing.T) {
-	hostname, err := computeHostnameWithInstanceID("myhostname", "i-123456789", "-", 5)
+	hostname, err := computeHostnameWithInstanceID("myhostname", "-", "i-123456789", 5)
 	if err != nil {
 		t.Fatalf("Shouldn't have returned any error, got : '%s'", err.Error())
 	}
@@ -26,7 +26,7 @@ func TestComputeHostnameWithInstanceID(t *testing.T) {
 		t.Fatalf("Should have retreived myhostname-12345, got '%s'", hostname)
 	}
 
-	hostname, err = computeHostnameWithInstanceID("myhostname-12345", "i-123456789", "-", 5)
+	hostname, err = computeHostnameWithInstanceID("myhostname-12345", "-", "i-123456789", 5)
 	if err != nil {
 		t.Fatalf("Shouldn't have returned any error, got : '%s'", err.Error())
 	}

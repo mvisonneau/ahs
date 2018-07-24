@@ -2,7 +2,7 @@
 
 
 [[projects]]
-  digest = "1:0a716f9eeca2c799b5f0ae48ba8f79b44d8c7ecff98b98c55e2f85f6fb68ce65"
+  digest = "1:8e0bcf3a41bf078c9ae23f74c18d6375fa88b30db83faa4de27ab6538c8d3901"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -32,6 +32,7 @@
     "private/protocol/query/queryutil",
     "private/protocol/rest",
     "private/protocol/xml/xmlutil",
+    "service/autoscaling",
     "service/ec2",
     "service/sts",
   ]
@@ -105,6 +106,7 @@
     "github.com/aws/aws-sdk-go/aws/awserr",
     "github.com/aws/aws-sdk-go/aws/ec2metadata",
     "github.com/aws/aws-sdk-go/aws/session",
+    "github.com/aws/aws-sdk-go/service/autoscaling",
     "github.com/aws/aws-sdk-go/service/ec2",
     "github.com/jpillora/backoff",
     "github.com/sirupsen/logrus",

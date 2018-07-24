@@ -84,6 +84,11 @@ func runCli() (c *cli.App) {
 					Usage:  "tag to use in order to determine which group the instance belongs to",
 					Value:  "ahs:instance-group",
 				},
+				cli.BoolFlag{
+					Name:   "respect-azs",
+					EnvVar: "AHS_RESPECT_AZS",
+					Usage:  "if instances are provisioned through an ASG, setting this flag it will get the sequential-ids associated to respective azs",
+				},
 			},
 			Action: run,
 		},
