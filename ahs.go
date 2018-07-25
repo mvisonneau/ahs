@@ -39,12 +39,13 @@ type Clients struct {
 
 // Values computed/generated
 type Values struct {
-	AZ           string
-	Base         string
-	Hostname     string
-	InstanceID   string
-	Region       string
-	SequentialID int
+	AZ            string
+	Base          string
+	Hostname      string
+	InstanceID    string
+	PrivateDomain string
+	Region        string
+	SequentialID  int
 }
 
 var start time.Time
@@ -79,19 +80,8 @@ func run(ctx *cli.Context) error {
 		Separator: ctx.GlobalString("separator"),
 	}
 
-	c := &Clients{
-		EC2: nil,
-		MDS: nil,
-	}
-
-	v := &Values{
-		AZ:           "",
-		Base:         "",
-		Hostname:     "",
-		InstanceID:   "",
-		Region:       "",
-		SequentialID: -1,
-	}
+	c := &Clients{}
+	v := &Values{}
 
 	// Configure MDS Client
 	if err := c.getAWSMDSClient(); err != nil {
@@ -172,14 +162,31 @@ func run(ctx *cli.Context) error {
 		return exit(cli.NewExitError(err.Error(), 1))
 	}
 
+	var privateDomain string
+	if ctx.GlobalBool("update-private-dns-name") {
+		instance, err := c.getInstanceByID(v.InstanceID)
+		if err != nil {
+			return exit(cli.NewExitError(analyzeEC2APIErrors(err), 1))
+		}
+
+		var privateDomain string
+		if len(ctx.GlobalString("private-domain-tag")) > 0 {
+			privateDomain, err = getPrivateDomainFromTag(instance, ctx.GlobalString("private-domain-tag"))
+			if err != nil {
+				return exit(cli.NewExitError(analyzeEC2APIErrors(err), 1))
+			}
+		} else {
+			privateDomain, err = computePrivateDomainFromExistingPrivateDNS(instance)
+		}
+	}
+
 	if !ctx.GlobalBool("dry-run") {
-		log.Infof("Setting instance hostname locally")
 		if err := setSystemHostname(v.Hostname); err != nil {
 			return exit(cli.NewExitError(err.Error(), 1))
 		}
 
-		log.Infof("Setting hostname on configured instance output tag '%s'", p.OutputTag)
 		if err := c.setTagValue(v.InstanceID, p.OutputTag, v.Hostname); err != nil {
+			log.Infof("Setting hostname on configured instance output tag '%s'", p.OutputTag)
 			return exit(cli.NewExitError(analyzeEC2APIErrors(err), 1))
 		}
 
@@ -189,12 +196,18 @@ func run(ctx *cli.Context) error {
 				return exit(cli.NewExitError(analyzeEC2APIErrors(err), 1))
 			}
 		}
+
+		if ctx.GlobalBool("update-private-dns-name") {
+
+		}
 	} else {
 		log.Infof("Setting instance hostname locally (dry-run)")
 		log.Infof("Setting hostname on configured instance tag '%s' (dry-run)", p.OutputTag)
 		if ctx.Command.FullName() == "sequential" {
 			log.Infof("Setting instance sequential id (%d) on configured tag '%s' (dry-run)", v.SequentialID, ctx.String("instance-sequential-id-tag"))
 		}
+		if ctx.GlobalBool("update-private-dns-name") {
+			log.Infof("Setting instance sequential id (%d) on configured tag '%s' (dry-run)", v.SequentialID, ctx.String("instance-sequential-id-tag"))
 	}
 
 	return exit(nil)
@@ -305,6 +318,7 @@ func analyzeEC2APIErrors(err error) string {
 }
 
 func setSystemHostname(hostname string) error {
+	log.Infof("Setting instance hostname locally")
 	return syscall.Sethostname([]byte(hostname))
 }
 
@@ -497,6 +511,63 @@ func computeMostAdequateSequentialID(instances *ec2.DescribeInstancesOutput, seq
 		}
 	}
 	return (len(used) + 1) * modulo, nil
+}
+
+func (c *Clients) getInstanceByID(id string) (*ec2.Instance, error) {
+	log.Infof("Getting instance object from EC2 api for '%s'", id)
+	instances, err := c.EC2.DescribeInstances(&ec2.DescribeInstancesInput{
+		Filters: []*ec2.Filter{
+			{
+				Name: aws.String("instance-id"),
+				Values: []*string{
+					aws.String(instanceID),
+				},
+			},
+		},
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if len(instances.Reservations) != 1 {
+		return nil, fmt.Errorf("Unexpected amount of instances retrieved : '%d',  expected 1", len(instances.Reservations))
+	}
+
+	return instances.Reservations[0].Instances[0], nil
+}
+
+func getPrivateDomainFromTag(instance *ec2.Instance, privateDomainTag string) (string, error) {
+	log.Infof("Querying private-domain-tag '%s' from EC2 instance", privateDomainTag)
+
+	for _, tag := range instance.Tags {
+		if *tag.Key == inputTag {
+			log.Infof("Found private-domain-tag '%s' : '%s' ", privateDomainTag, *tag.Value)
+			return *tag.Value, nil
+		}
+	}
+
+	log.Infof("private-domain-tag '%s' not found on instance '%s'", privateDomainTag, *instance.InstanceId)
+	return "", nil
+}
+
+func computePrivateDomainFromExistingPrivateDNS(instance *ec2.Instance) (string, error) {
+	log.Infof("Compute Private Domain from existing PrivateDNS value : '%s'", *instance.PrivateDnsName)
+
+	re := regexp.MustCompile("^([\\w-]+)\\.(.*)$")
+	if !re.MatchString(*instance.PrivateDnsName) {
+		return "", fmt.Errorf("Invalid PrivateDnsName fetched from instance : '%s'", *instance.PrivateDnsName)
+	}
+
+	domain := re.FindStringSubmatch(*instance.PrivateDnsName)[2]
+	log.Infof("Found domain : '%s'", domain)
+	return domain, nil
+}
+
+func (c *Clients) setInstancePrivateDnsName(instance *ec2.Instance, fqdn string) error {
+	log.Infof("Setting PrivateDNSName to '%s' on instance", fqdn)
+
+
 }
 
 func exit(err error) error {

@@ -45,10 +45,21 @@ func runCli() (c *cli.App) {
 			Value:  "Name",
 		},
 		cli.StringFlag{
+			Name:   "private-domain-tag",
+			EnvVar: "AHS_PRIVATE_DOMAIN_TAG",
+			Usage:  "optional, read the content of the specified tag as domain to use with 'update-private-dns-name' if set (default to the VPC configured DNS if tag is not found)",
+			Default: "Domain",
+		},
+		cli.StringFlag{
 			Name:   "separator",
 			EnvVar: "AHS_SEPARATOR",
 			Usage:  "`separator` to use between tag and id",
 			Value:  "-",
+		},
+		cli.BoolFlag{
+			Name:   "update-private-dns-name",
+			EnvVar: "AHS_UPDATE_PRIVATE_DNS_NAME",
+			Usage:  "if set to true, it will also update the EC2 instance private DNS name",
 		},
 	}
 
