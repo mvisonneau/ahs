@@ -12,7 +12,7 @@ In particular when they are launched as part of ASGs or fleets.
 ## TL;DR
 
 ```
-~$ wget https://github.com/mvisonneau/ahs/releases/download/0.1.1/ahs_linux_amd64 -O /usr/local/bin/ahs; chmod +x /usr/local/bin/ahs
+~$ wget https://github.com/mvisonneau/ahs/releases/download/0.2.0/ahs_linux_amd64 -O /usr/local/bin/ahs; chmod +x /usr/local/bin/ahs
 
 # Using instance-id method
 ~$ ahs instance-id

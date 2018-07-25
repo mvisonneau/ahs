@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.2.0] - 2018-07-25
 ### FEATURES
 - Added a new flag `--respect-azs` for `sequential` method that ensure we keep sequential ids aligned with configured ASG AZs.
 
@@ -60,7 +62,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - License
 - Readme
 
-[Unreleased]: https://github.com/mvisonneau/ahs/compare/0.1.1...HEAD
+[Unreleased]: https://github.com/mvisonneau/ahs/compare/0.2.0...HEAD
+[0.2.0]: https://github.com/mvisonneau/ahs/tree/0.2.0
 [0.1.1]: https://github.com/mvisonneau/ahs/tree/0.1.1
 [0.1.0]: https://github.com/mvisonneau/ahs/tree/0.1.0
 [0.0.3]: https://github.com/mvisonneau/ahs/tree/0.0.3
