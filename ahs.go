@@ -79,19 +79,8 @@ func run(ctx *cli.Context) error {
 		Separator: ctx.GlobalString("separator"),
 	}
 
-	c := &Clients{
-		EC2: nil,
-		MDS: nil,
-	}
-
-	v := &Values{
-		AZ:           "",
-		Base:         "",
-		Hostname:     "",
-		InstanceID:   "",
-		Region:       "",
-		SequentialID: -1,
-	}
+	c := &Clients{}
+	v := &Values{}
 
 	// Configure MDS Client
 	if err := c.getAWSMDSClient(); err != nil {
