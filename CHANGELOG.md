@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Updated dependencies to their latest versions
 - Updated to `go 1.12`
 - Switched to **go modules**
+- Updated `Dockerfile` to use **busybox** instead of **scratch** image as source
 
 ## [0.2.0] - 2018-07-25
 ### FEATURES

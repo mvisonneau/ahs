@@ -2,9 +2,9 @@
 # BUILD CONTAINER
 ##
 
-FROM golang:1.10 as builder
+FROM golang:1.12 as builder
 
-WORKDIR /go/src/github.com/mvisonneau/ahs
+WORKDIR /build
 
 COPY Makefile .
 RUN \
@@ -12,18 +12,17 @@ make setup
 
 COPY . .
 RUN \
-make deps ;\
 make build-docker
 
 ##
 # RELEASE CONTAINER
 ##
 
-FROM scratch
+FROM busybox:1.30-glibc
 
 WORKDIR /
 
-COPY --from=builder /go/src/github.com/mvisonneau/ahs/ahs /
+COPY --from=builder /build/ahs /usr/local/bin/
 
-ENTRYPOINT ["/ahs"]
+ENTRYPOINT ["/usr/local/bin/ahs"]
 CMD [""]
