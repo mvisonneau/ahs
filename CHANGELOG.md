@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### FEATURES
 - New flag `--persist-hostname` which will update the `/etc/hostname` file value with the generated hostname
 - New flag `--persist-hosts` which will set the generated hostname as a host pointing to the loopback
+- Released `arm64` binaries
 
 ### ENHANCEMENTS
 - Makefile improvements
