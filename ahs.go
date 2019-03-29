@@ -498,7 +498,7 @@ func computeMostAdequateSequentialID(instances *ec2.DescribeInstancesOutput, seq
 							}
 						}
 
-						if ! skip {
+						if !skip {
 							used = append(used, v)
 							log.Debugf("Found running instance '%s' with sequential id '%d' ", *instance.InstanceId, v)
 						}
@@ -536,15 +536,15 @@ func updateHostnameFile(hostname string) error {
 }
 
 func updateHostsFile(hostname string) error {
-	 hosts, err := txeh.NewHostsDefault()
-	 if err != nil {
-		 return err
-	 }
+	hosts, err := txeh.NewHostsDefault()
+	if err != nil {
+		return err
+	}
 
-	 hosts.RemoveHosts([]string{hostname})
-	 hosts.AddHost("127.0.0.1", hostname)
+	hosts.RemoveHosts([]string{hostname})
+	hosts.AddHost("127.0.0.1", hostname)
 
-	 return hosts.Save()
+	return hosts.Save()
 }
 
 func exit(err error) error {
