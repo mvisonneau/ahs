@@ -12,7 +12,7 @@ In particular when they are launched as part of ASGs or fleets.
 ## TL;DR
 
 ```
-~$ wget https://github.com/mvisonneau/ahs/releases/download/0.2.0/ahs_linux_amd64 -O /usr/local/bin/ahs; chmod +x /usr/local/bin/ahs
+~$ wget https://github.com/mvisonneau/ahs/releases/download/0.2.1/ahs_linux_amd64 -O /usr/local/bin/ahs; chmod +x /usr/local/bin/ahs
 
 # Using instance-id method
 ~$ ahs instance-id
@@ -68,6 +68,8 @@ GLOBAL OPTIONS:
    --log-level level      log level (debug,info,warn,fatal,panic) (default: "info") [$AHS_LOG_LEVEL]
    --log-format format    log format (json,text) (default: "text") [$AHS_LOG_FORMAT]
    --output-tag tag       tag to update with the computed hostname (default: "Name") [$AHS_OUTPUT_TAG]
+   --persist-hostname     set /etc/hostname with generated hostname [$AHS_PERSIST_HOSTNAME]
+   --persist-hosts        assign generated hostname to 127.0.0.1 in /etc/hosts [$AHS_PERSIST_HOSTS]
    --separator separator  separator to use between tag and id (default: "-") [$AHS_SEPARATOR]
    --help, -h             show help
    --version, -v          print the version
@@ -117,15 +119,13 @@ all                            Test, builds and ship package for all supported p
 build                          Build the binary
 clean                          Remove binary if it exists
 coverage                       Generates coverage report
-deps                           Fetch all dependencies
 dev-env                        Build a local development environment using Docker
 fmt                            Format source code
 help                           Displays this help
 imports                        Fixes the syntax (linting) of the codebase
 install                        Build and install locally the binary (dev purpose)
 lint                           Run golint and go vet against the codebase
-publish-github                 Publish the compiled binaries onto the GitHub release API
-publish-goveralls              Publish coverage stats on goveralls
+publish-github                 Send the binaries onto the GitHub release
 setup                          Install required libraries/tools
 test                           Run the tests against the codebase
 ```
