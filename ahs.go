@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/user"
 	"regexp"
@@ -19,6 +20,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/jpillora/backoff"
 	log "github.com/sirupsen/logrus"
+	"github.com/txn2/txeh"
 	"github.com/urfave/cli"
 )
 
@@ -165,6 +167,20 @@ func run(ctx *cli.Context) error {
 		log.Infof("Setting instance hostname locally")
 		if err := setSystemHostname(v.Hostname); err != nil {
 			return exit(cli.NewExitError(err.Error(), 1))
+		}
+
+		if ctx.GlobalBool("persist-hostname") {
+			log.Infof("Persist hostname in /etc/hostname")
+			if err := updateHostnameFile(v.Hostname); err != nil {
+				return exit(cli.NewExitError(err.Error(), 1))
+			}
+		}
+
+		if ctx.GlobalBool("persist-hosts") {
+			log.Infof("Persist hostname in /etc/hosts")
+			if err := updateHostsFile(v.Hostname); err != nil {
+				return exit(cli.NewExitError(err.Error(), 1))
+			}
 		}
 
 		log.Infof("Setting hostname on configured instance output tag '%s'", p.OutputTag)
@@ -513,6 +529,22 @@ func computeMostAdequateSequentialID(instances *ec2.DescribeInstancesOutput, seq
 
 	// if there is not a single instance, we start with the offset
 	return offset, nil
+}
+
+func updateHostnameFile(hostname string) error {
+	return ioutil.WriteFile("/etc/hostname", []byte(hostname+"\n"), 0644)
+}
+
+func updateHostsFile(hostname string) error {
+	 hosts, err := txeh.NewHostsDefault()
+	 if err != nil {
+		 return err
+	 }
+
+	 hosts.RemoveHosts([]string{hostname})
+	 hosts.AddHost("127.0.0.1", hostname)
+
+	 return hosts.Save()
 }
 
 func exit(err error) error {

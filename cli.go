@@ -44,6 +44,16 @@ func runCli() (c *cli.App) {
 			Usage:  "`tag` to update with the computed hostname",
 			Value:  "Name",
 		},
+		cli.BoolFlag{
+			Name:   "persist-hostname",
+			EnvVar: "AHS_PERSIST_HOSTNAME",
+			Usage:  "set /etc/hostname with generated hostname",
+		},
+		cli.BoolFlag{
+			Name:   "persist-hosts",
+			EnvVar: "AHS_PERSIST_HOSTS",
+			Usage:  "assign generated hostname to 127.0.0.1 in /etc/hosts",
+		},
 		cli.StringFlag{
 			Name:   "separator",
 			EnvVar: "AHS_SEPARATOR",

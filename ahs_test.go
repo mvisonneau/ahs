@@ -2,7 +2,10 @@ package main
 
 import (
 	"errors"
+	"io/ioutil"
 	"testing"
+
+	"github.com/txn2/txeh"
 )
 
 func TestAnalyzeEC2APIErrors(t *testing.T) {
@@ -51,6 +54,41 @@ func TestInvalidComputeRegionFromAZ(t *testing.T) {
 	_, err := computeRegionFromAZ("foo")
 	if err == nil {
 		t.Fatal("Should have thrown an error, got nil")
+	}
+}
+
+func TestUpdateHostnameFile(t *testing.T) {
+	if err := updateHostnameFile("myhostname"); err != nil {
+		t.Fatalf("Shouldn't have returned any error, got : '%s'", err.Error())
+	}
+
+	content, err := ioutil.ReadFile("/etc/hostname")
+	if err != nil {
+		t.Fatalf("Should have been able to read /etc/hostname without error, got : '%s'", err.Error())
+	}
+
+	if string(content) != "myhostname\n" {
+		t.Fatalf("/etc/hostname content should be equal to 'myhostname' but is '%s'", content)
+	}
+}
+
+func TestUpdateHostsFile(t *testing.T) {
+	if err := updateHostsFile("myhostname"); err != nil {
+		t.Fatalf("Shouldn't have returned any error, got : '%s'", err.Error())
+	}
+
+	hosts, err := txeh.NewHostsDefault()
+	if err != nil {
+		t.Fatalf("Shouldn't have returned any error, got : '%s'", err.Error())
+	}
+
+	found, address, _ := hosts.HostAddressLookup("myhostname")
+	if !found {
+		t.Fatalf("'myhostname' host could not be found in /etc/hosts")
+	}
+
+	if address != "127.0.0.1" {
+		t.Fatalf("'myhostname' address is not equal to 127.0.0.1, got '%s'", address)
 	}
 }
 
