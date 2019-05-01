@@ -2,7 +2,7 @@ NAME          := ahs
 VERSION       := $(shell git describe --tags --abbrev=1)
 FILES         := $(shell git ls-files '*.go')
 LDFLAGS       := -w -extldflags "-static" -X 'main.version=$(VERSION)'
-REGISTRY      := mvisonneau/$(NAME)
+REPOSITORY    := mvisonneau/$(NAME)
 .DEFAULT_GOAL := help
 
 export GO111MODULE=on
@@ -69,6 +69,10 @@ dev-env: ## Build a local development environment using Docker
 		-w /go/src/github.com/mvisonneau/$(NAME) \
 		golang:1.12 \
 		/bin/bash -c 'make setup; make install; bash'
+
+.PHONY: sign-drone
+sign-drone: ## Sign Drone CI configuration
+	drone sign $(REPOSITORY) --save
 
 .PHONY: all
 all: lint test build coverage ## Test, builds and ship package for all supported platforms
