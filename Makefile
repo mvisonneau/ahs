@@ -18,13 +18,15 @@ setup: ## Install required libraries/tools for build tasks
 
 .PHONY: fmt
 fmt: setup ## Format source code
+	gofmt -s -w $(FILES)
 	goimports -w $(FILES)
 
 .PHONY: lint
 lint: setup ## Run golint, goimports and go vet against the codebase
 	golint -set_exit_status .
 	go vet ./...
-	goimports -d $(FILES)
+	goimports -d $(FILES) > goimports.out
+	@if [ -s goimports.out ]; then cat goimports.out; rm goimports.out; exit 1; else rm goimports.out; fi
 
 .PHONY: test
 test: ## Run the tests against the codebase
