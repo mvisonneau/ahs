@@ -403,22 +403,42 @@ func (c *Clients) findInstanceGroupTagValue(groupTag, instanceID string) (string
 	return *tags.Tags[0].Value, nil
 }
 
-func (c *Clients) findAZsFromASG(asgName string) ([]*string, error) {
-	log.Debugf("Searching configured AZs for ASG '%s'", asgName)
+func (c *Clients) getASG(asgName string) (*autoscaling.Group, error) {
+	log.Debugf("Looking for ASG '%s'", asgName)
 	asgs, err := c.Autoscaling.DescribeAutoScalingGroups(&autoscaling.DescribeAutoScalingGroupsInput{
 		AutoScalingGroupNames: []*string{&asgName},
 	})
 
 	if err != nil {
-		return []*string{}, err
+		return nil, err
 	}
 
 	if len(asgs.AutoScalingGroups) != 1 {
-		return []*string{}, fmt.Errorf("Unexpected amount of asgs retrieved : '%d',  expected 1", len(asgs.AutoScalingGroups))
+		return nil, fmt.Errorf("Unexpected amount of asgs retrieved : '%d',  expected 1", len(asgs.AutoScalingGroups))
 	}
 
-	log.Debugf("Found '%d' AZ(s)", len(asgs.AutoScalingGroups[0].AvailabilityZones))
-	return asgs.AutoScalingGroups[0].AvailabilityZones, nil
+	return asgs.AutoScalingGroups[0], nil
+}
+
+func (c *Clients) getASGAZs(asgName string) ([]*string, error) {
+	asg, err := c.getASG(asgName)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Debugf("Found '%d' AZ(s)", len(asg.AvailabilityZones))
+	return asg.AvailabilityZones, nil
+}
+
+func (c *Clients) getASGMaxInstances(asgName string) (int, error) {
+	log.Debugf("Getting maximum size of the ASG", asgName)
+	asg, err := c.getASG(asgName)
+	if err != nil {
+		return 0, err
+	}
+
+	log.Debugf("Found ASG '%d' max size : %d", asgName, int(*asg.MaxSize))
+	return int(*asg.MaxSize), nil
 }
 
 func (c *Clients) findAvailableSequentialIDPerRegion(instanceGroup, groupTag, sequentialIDTag string) (int, error) {
@@ -443,7 +463,12 @@ func (c *Clients) findAvailableSequentialIDPerRegion(instanceGroup, groupTag, se
 
 func (c *Clients) findAvailableSequentialIDPerAZ(instanceAZ, instanceGroup, groupTag, sequentialIDTag string) (int, error) {
 	log.Debugf("Looking up how many AZs are configured on the ASG")
-	azs, err := c.findAZsFromASG(instanceGroup)
+	azs, err := c.getASGAZs(instanceGroup)
+	if err != nil {
+		return -1, err
+	}
+
+	max, err := c.getASGMaxInstances(instanceGroup)
 	if err != nil {
 		return -1, err
 	}
@@ -480,7 +505,16 @@ func (c *Clients) findAvailableSequentialIDPerAZ(instanceAZ, instanceGroup, grou
 		}
 	}
 
-	return computeMostAdequateSequentialID(instances, sequentialIDTag, offset, len(azs))
+	computedID, err := computeMostAdequateSequentialID(instances, sequentialIDTag, offset, len(azs))
+	if err != nil {
+		return -1, err
+	}
+
+	if computedID > max {
+		return -1, fmt.Errorf("Computed ID %d is higher than the size of the ASG.. (%d)", computedID, max)
+	} 
+
+	return computedID, nil
 }
 
 func computeMostAdequateSequentialID(instances *ec2.DescribeInstancesOutput, sequentialIDTag string, offset, modulo int) (int, error) {
