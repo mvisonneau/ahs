@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### BUGFIXES
+- Ensure that we do not have sequential id higher than the ASG max size
+
 ### ENHANCEMENTS
 - Fix fmt test function false positive
 - Bumped dependencies
