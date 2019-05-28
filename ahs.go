@@ -431,13 +431,13 @@ func (c *Clients) getASGAZs(asgName string) ([]*string, error) {
 }
 
 func (c *Clients) getASGMaxInstances(asgName string) (int, error) {
-	log.Debugf("Getting maximum size of the ASG", asgName)
+	log.Debugf("Getting maximum size of the ASG '%s'", asgName)
 	asg, err := c.getASG(asgName)
 	if err != nil {
 		return 0, err
 	}
 
-	log.Debugf("Found ASG '%d' max size : %d", asgName, int(*asg.MaxSize))
+	log.Debugf("Found ASG '%s' max size : %d", asgName, int(*asg.MaxSize))
 	return int(*asg.MaxSize), nil
 }
 
@@ -512,7 +512,7 @@ func (c *Clients) findAvailableSequentialIDPerAZ(instanceAZ, instanceGroup, grou
 
 	if computedID > max {
 		return -1, fmt.Errorf("Computed ID %d is higher than the size of the ASG.. (%d)", computedID, max)
-	} 
+	}
 
 	return computedID, nil
 }
