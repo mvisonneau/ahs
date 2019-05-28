@@ -24,6 +24,10 @@ import (
 	"github.com/urfave/cli"
 )
 
+const (
+	sequential = "sequential"
+)
+
 // Params of the app
 type Params struct {
 	Backoff   *backoff.Backoff
@@ -132,8 +136,9 @@ func run(ctx *cli.Context) error {
 	switch ctx.Command.FullName() {
 	case "instance-id":
 		v.Hostname, err = computeHostnameWithInstanceID(v.Base, p.Separator, v.InstanceID, ctx.Int("length"))
-	case "sequential":
-		instanceGroup, err := c.findInstanceGroupTagValue(ctx.String("instance-group-tag"), v.InstanceID)
+	case sequential:
+		var instanceGroup string
+		instanceGroup, err = c.findInstanceGroupTagValue(ctx.String("instance-group-tag"), v.InstanceID)
 		if err != nil {
 			return exit(cli.NewExitError(analyzeEC2APIErrors(err), 1))
 		}
@@ -145,7 +150,7 @@ func run(ctx *cli.Context) error {
 			}
 		} else {
 			// Configure Autoscaling Client
-			if err := c.getAWSAutoscalingClient(v.Region); err != nil {
+			if err = c.getAWSAutoscalingClient(v.Region); err != nil {
 				return exit(cli.NewExitError(analyzeEC2APIErrors(err), 1))
 			}
 
@@ -188,7 +193,7 @@ func run(ctx *cli.Context) error {
 			return exit(cli.NewExitError(analyzeEC2APIErrors(err), 1))
 		}
 
-		if ctx.Command.FullName() == "sequential" {
+		if ctx.Command.FullName() == sequential {
 			log.Infof("Setting instance sequential id (%d) on configured tag '%s'", v.SequentialID, ctx.String("instance-sequential-id-tag"))
 			if err := c.setTagValue(v.InstanceID, ctx.String("instance-sequential-id-tag"), strconv.Itoa(v.SequentialID)); err != nil {
 				return exit(cli.NewExitError(analyzeEC2APIErrors(err), 1))
@@ -197,7 +202,7 @@ func run(ctx *cli.Context) error {
 	} else {
 		log.Infof("Setting instance hostname locally (dry-run)")
 		log.Infof("Setting hostname on configured instance tag '%s' (dry-run)", p.OutputTag)
-		if ctx.Command.FullName() == "sequential" {
+		if ctx.Command.FullName() == sequential {
 			log.Infof("Setting instance sequential id (%d) on configured tag '%s' (dry-run)", v.SequentialID, ctx.String("instance-sequential-id-tag"))
 		}
 	}
