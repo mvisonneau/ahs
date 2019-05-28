@@ -122,11 +122,12 @@ coverage                       Generates coverage report
 dev-env                        Build a local development environment using Docker
 fmt                            Format source code
 help                           Displays this help
-imports                        Fixes the syntax (linting) of the codebase
 install                        Build and install locally the binary (dev purpose)
-lint                           Run golint and go vet against the codebase
-publish-github                 Send the binaries onto the GitHub release
-setup                          Install required libraries/tools
+lint                           Run golint, goimports and go vet against the codebase
+publish-coveralls              Publish coverage results on coveralls
+publish-github                 Upload the binaries onto the GitHub release
+setup                          Install required libraries/tools for build tasks
+sign-drone                     Sign Drone CI configuration
 test                           Run the tests against the codebase
 ```
 
