@@ -3,7 +3,7 @@ module github.com/mvisonneau/ahs
 go 1.12
 
 require (
-	github.com/aws/aws-sdk-go v1.26.0
+	github.com/aws/aws-sdk-go v1.26.1
 	github.com/go-ini/ini v1.51.0
 	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af
 	github.com/jpillora/backoff v0.0.0-20170918002102-8eab2debe79d
