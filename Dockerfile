@@ -2,7 +2,7 @@
 # BUILD CONTAINER
 ##
 
-FROM golang:1.14.0 as builder
+FROM golang:1.14.1 as builder
 
 WORKDIR /build
 
