@@ -4,17 +4,19 @@ name: test
 
 steps:
   - name: lint
-    image: golang:1.12
+    image: golang:1.14
     commands:
       - make lint
   - name: test
-    image: golang:1.12
+    image: golang:1.14
     commands:
       - make test
   - name: build
-    image: golang:1.12
+    image: goreleaser/goreleaser:v0.130.2
     commands:
+      - apk add --no-cache make
       - make build
+      - make is-git-dirty
   - name: all_ok
     image: busybox
     depends_on:
@@ -36,7 +38,7 @@ name: coverage
 
 steps:
   - name: coverage
-    image: golang:1.12
+    image: golang:1.14
     environment:
       COVERALLS_TOKEN:
         from_secret: COVERALLS_TOKEN
@@ -53,7 +55,7 @@ trigger:
 
 ---
 kind: pipeline
-name: build
+name: release
 
 steps:
   - name: fetch
@@ -61,14 +63,14 @@ steps:
     commands:
       - git fetch --tags
 
-  - name: build
-    image: golang:1.12
+  - name: release
+    image: goreleaser/goreleaser:v0.130.2
     environment:
       GITHUB_TOKEN:
         from_secret: GITHUB_TOKEN
     commands:
-      - make build
-      - make publish-github
+      - apk add --no-cache make
+      - make release
 
 trigger:
   repo:
@@ -79,9 +81,8 @@ trigger:
 depends_on:
   - test
   - coverage
-
 ---
 kind: signature
-hmac: 035e4b5228f49d81efc2aa59af2eee7fc7b1a13f8b2616e449a167d100f69b97
+hmac: d85aee1da87e2b1865b042c163b3fe478ea65caa0f6ee7f72905ab8ba72aa6f3
 
 ...

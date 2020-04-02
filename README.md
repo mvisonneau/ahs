@@ -1,4 +1,4 @@
-# ahs
+# 🏷 ahs - Amazon Hostname Setter
 
 [![GoDoc](https://godoc.org/github.com/mvisonneau/ahs?status.svg)](https://godoc.org/github.com/mvisonneau/ahs)
 [![Go Report Card](https://goreportcard.com/badge/github.com/mvisonneau/ahs)](https://goreportcard.com/report/github.com/mvisonneau/ahs)
@@ -11,9 +11,7 @@ In particular when they are launched as part of ASGs or fleets.
 
 ## TL;DR
 
-```
-~$ wget https://github.com/mvisonneau/ahs/releases/download/0.2.2/ahs_linux_amd64 -O /usr/local/bin/ahs; chmod +x /usr/local/bin/ahs
-
+```bash
 # Using instance-id method
 ~$ ahs instance-id
 INFO[2018-07-23T11:56:00Z] Found AZ: 'eu-west-1a'
@@ -44,9 +42,47 @@ You can also use a *Dockerized version* if you prefer :
 ~$ docker run -it --rm --privileged mvisonneau/ahs <instance-id|sequential>
 ```
 
+## Install
+
+Have a look onto the [latest release page](https://github.com/mvisonneau/ahs/releases/latest) and pick your flavor.
+
+### Go
+
+```bash
+~$ go get -u github.com/mvisonneau/ahs
+```
+
+### Docker
+
+```bash
+~$ docker run -it --rm --privileged mvisonneau/ahs
+```
+
+### Binaries, DEB and RPM packages
+
+For the following ones, you need to know which version you want to install, to fetch the latest available :
+
+```bash
+~$ export AHS_VERSION=$(curl -s "https://api.github.com/repos/mvisonneau/ahs/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+```
+
+```bash
+# Binary (eg: freebsd/amd64)
+~$ wget https://github.com/mvisonneau/ahs/releases/download/${AHS_VERSION}/ahs_${AHS_VERSION}_freebsd_amd64.tar.gz
+~$ tar zxvf ahs_${AHS_VERSION}_freebsd_amd64.tar.gz -C /usr/local/bin
+
+# DEB package (eg: linux/386)
+~$ wget https://github.com/mvisonneau/ahs/releases/download/${AHS_VERSION}/ahs_${AHS_VERSION}_linux_386.deb
+~$ dpkg -i ahs_${AHS_VERSION}_linux_386.deb
+
+# RPM package (eg: linux/arm64)
+~$ wget https://github.com/mvisonneau/ahs/releases/download/${AHS_VERSION}/ahs_${AHS_VERSION}_linux_arm64.rpm
+~$ rpm -ivh ahs_${AHS_VERSION}_linux_arm64.rpm
+```
+
 ## Usage
 
-```
+```bash
 ~$ ahs
 NAME:
    ahs - Set the hostname of an EC2 instance based on a tag value and the instance-id
@@ -79,7 +115,7 @@ GLOBAL OPTIONS:
 
 This method basically takes the output of a tag considered as the `base` of the hostname, it appends a separator to it (default to `-`) and finally a truncated value of the instance-id (default to `5 characters`).
 
-```
+```bash
 ~$ ahs instance-id -h
 NAME:
    ahs instance-id - compute a hostname by appending the instance-id to a prefixed/base string
@@ -95,7 +131,7 @@ OPTIONS:
 
 This method allows you to have sequential hostnames on instances on which you couldn't or haven't configured at the time of provisioning.
 
-```
+```bash
 ~$ ahs sequential -h
 NAME:
    ahs sequential - compute a sequential hostname based on the number of instances belonging to the same group
@@ -111,24 +147,31 @@ OPTIONS:
 
 ## Develop
 
-If you have docker locally, you can use the following command in order to quickly get a development env ready: `make dev-env`. You can also have a look onto the [Makefile](/Makefile) in order to see all available options:
+You can have a look at the [Makefile](/Makefile) in order to see all available options:
 
-```
+```bash
 ~$ make
 all                            Test, builds and ship package for all supported platforms
-build                          Build the binary
+build-local                    Build the binaries using local GOOS
+build                          Build the binaries
 clean                          Remove binary if it exists
 coverage                       Generates coverage report
-dev-env                        Build a local development environment using Docker
 fmt                            Format source code
+goimports                      Test code syntax with goimports
 help                           Displays this help
+ineffassign                    Test code syntax for ineffassign
 install                        Build and install locally the binary (dev purpose)
-lint                           Run golint, goimports and go vet against the codebase
+is-git-dirty                   Tests if git is in a dirty state
+lint                           Run all lint related tests against the codebase
+misspell                       Test code with misspell
 publish-coveralls              Publish coverage results on coveralls
-publish-github                 Upload the binaries onto the GitHub release
+release                        Build & release the binaries
+revive                         Test code syntax with revive
 setup                          Install required libraries/tools for build tasks
+show-coverage                  Display coverage report in browser
 sign-drone                     Sign Drone CI configuration
 test                           Run the tests against the codebase
+vet                            Test code syntax with go vet
 ```
 
 ## Contribute

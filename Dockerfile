@@ -2,17 +2,14 @@
 # BUILD CONTAINER
 ##
 
-FROM golang:1.14.1 as builder
+FROM goreleaser/goreleaser:v0.130.2 as builder
 
 WORKDIR /build
 
-COPY Makefile .
-RUN \
-make setup
-
 COPY . .
 RUN \
-make build-docker
+apk add --no-cache make ;\
+make build-linux-amd64
 
 ##
 # RELEASE CONTAINER
@@ -22,7 +19,7 @@ FROM busybox:1.31-glibc
 
 WORKDIR /
 
-COPY --from=builder /build/ahs /usr/local/bin/
+COPY --from=builder /build/dist/ahs_linux_amd64/ahs /usr/local/bin/
 
 ENTRYPOINT ["/usr/local/bin/ahs"]
 CMD [""]
