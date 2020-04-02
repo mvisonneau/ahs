@@ -12,11 +12,13 @@ and this project adheres to [0ver](https://0ver.org).
 - Release binaries using goreleaser
 - Releases 386 and arm64 arch
 - deb and rpm packages
+- stretchr/testify/assert library for tests
 
 ### Changed
 
 - Bumped to go 1.14
 - Bumped all go modules to their latest versions
+- Refactored the codebase for better domain distinction
 
 ## [0.2.3] - 2019-05-28
 

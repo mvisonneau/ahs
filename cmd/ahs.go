@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"errors"
@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/autoscaling"
@@ -53,24 +52,17 @@ type Values struct {
 	SequentialID int
 }
 
-var start time.Time
-
-func run(ctx *cli.Context) error {
-	start = time.Now()
-
-	logger := &Logger{
-		Level:  ctx.GlobalString("log-level"),
-		Format: ctx.GlobalString("log-format"),
-	}
-
-	if err := logger.Configure(); err != nil {
-		panic(err)
+// Run is the main handler for all our functions
+// TODO: Break it apart in smaller ones
+func Run(ctx *cli.Context) (int, error) {
+	if err := configure(ctx); err != nil {
+		return 1, err
 	}
 
 	if user, err := user.Current(); err != nil {
-		return exit(cli.NewExitError("Unable to determine current user", 1))
+		return 1, fmt.Errorf("Unable to determine current user")
 	} else if user.Username != "root" {
-		return exit(cli.NewExitError("You have to run this function as root", 1))
+		return 1, fmt.Errorf("You have to run this function as root")
 	}
 
 	p := &Params{
@@ -90,31 +82,31 @@ func run(ctx *cli.Context) error {
 
 	// Configure MDS Client
 	if err := c.getAWSMDSClient(); err != nil {
-		return exit(cli.NewExitError(err.Error(), 1))
+		return 1, err
 	}
 
 	// Fetch current AZ
 	var err error
 	v.AZ, err = c.getInstanceAZ()
 	if err != nil {
-		return exit(cli.NewExitError(err.Error(), 1))
+		return 1, err
 	}
 
 	// Compute region from AZ
 	v.Region, err = computeRegionFromAZ(v.AZ)
 	if err != nil {
-		return exit(cli.NewExitError(err.Error(), 1))
+		return 1, err
 	}
 
 	// Configure EC2 Client
 	if err := c.getAWSEC2Client(v.Region); err != nil {
-		return exit(cli.NewExitError(err.Error(), 1))
+		return 1, err
 	}
 
 	// Fetch instance ID
 	v.InstanceID, err = c.getInstanceID()
 	if err != nil {
-		return exit(cli.NewExitError(err.Error(), 1))
+		return 1, err
 	}
 
 	// Fetch the value of the input-tag and use it a base for the hostname
@@ -123,9 +115,9 @@ func run(ctx *cli.Context) error {
 		if err != nil {
 			d := p.Backoff.Duration()
 			if d == 60*time.Second {
-				return exit(cli.NewExitError(analyzeEC2APIErrors(err), 1))
+				return 1, err
 			}
-			log.Infof("%s, retrying in %s", analyzeEC2APIErrors(err), d)
+			log.Infof("%s, retrying in %s", err, d)
 			time.Sleep(d)
 		} else {
 			p.Backoff.Reset()
@@ -140,63 +132,63 @@ func run(ctx *cli.Context) error {
 		var instanceGroup string
 		instanceGroup, err = c.findInstanceGroupTagValue(ctx.String("instance-group-tag"), v.InstanceID)
 		if err != nil {
-			return exit(cli.NewExitError(analyzeEC2APIErrors(err), 1))
+			return 1, err
 		}
 
 		if !ctx.Bool("respect-azs") {
 			v.SequentialID, err = c.findAvailableSequentialIDPerRegion(instanceGroup, ctx.String("instance-group-tag"), ctx.String("instance-sequential-id-tag"))
 			if err != nil {
-				return exit(cli.NewExitError(analyzeEC2APIErrors(err), 1))
+				return 1, err
 			}
 		} else {
 			// Configure Autoscaling Client
 			if err = c.getAWSAutoscalingClient(v.Region); err != nil {
-				return exit(cli.NewExitError(analyzeEC2APIErrors(err), 1))
+				return 1, err
 			}
 
 			v.SequentialID, err = c.findAvailableSequentialIDPerAZ(v.AZ, instanceGroup, ctx.String("instance-group-tag"), ctx.String("instance-sequential-id-tag"))
 			if err != nil {
-				return exit(cli.NewExitError(analyzeEC2APIErrors(err), 1))
+				return 1, err
 			}
 		}
 		v.Hostname, err = computeSequentialHostname(v.Base, p.Separator, v.SequentialID)
 	default:
-		return exit(cli.NewExitError(fmt.Sprintf("Function %v is not implemented", ctx.Command.FullName()), 1))
+		return 1, fmt.Errorf("Function %v is not implemented", ctx.Command.FullName())
 	}
 
 	if err != nil {
-		return exit(cli.NewExitError(err.Error(), 1))
+		return 1, err
 	}
 
 	if !ctx.GlobalBool("dry-run") {
 		log.Infof("Setting instance hostname locally")
 		if err := setSystemHostname(v.Hostname); err != nil {
-			return exit(cli.NewExitError(err.Error(), 1))
+			return 1, err
 		}
 
 		if ctx.GlobalBool("persist-hostname") {
 			log.Infof("Persist hostname in /etc/hostname")
 			if err := updateHostnameFile(v.Hostname); err != nil {
-				return exit(cli.NewExitError(err.Error(), 1))
+				return 1, err
 			}
 		}
 
 		if ctx.GlobalBool("persist-hosts") {
 			log.Infof("Persist hostname in /etc/hosts")
 			if err := updateHostsFile(v.Hostname); err != nil {
-				return exit(cli.NewExitError(err.Error(), 1))
+				return 1, err
 			}
 		}
 
 		log.Infof("Setting hostname on configured instance output tag '%s'", p.OutputTag)
 		if err := c.setTagValue(v.InstanceID, p.OutputTag, v.Hostname); err != nil {
-			return exit(cli.NewExitError(analyzeEC2APIErrors(err), 1))
+			return 1, err
 		}
 
 		if ctx.Command.FullName() == sequential {
 			log.Infof("Setting instance sequential id (%d) on configured tag '%s'", v.SequentialID, ctx.String("instance-sequential-id-tag"))
 			if err := c.setTagValue(v.InstanceID, ctx.String("instance-sequential-id-tag"), strconv.Itoa(v.SequentialID)); err != nil {
-				return exit(cli.NewExitError(analyzeEC2APIErrors(err), 1))
+				return 1, err
 			}
 		}
 	} else {
@@ -207,7 +199,7 @@ func run(ctx *cli.Context) error {
 		}
 	}
 
-	return exit(nil)
+	return 0, nil
 }
 
 func (c *Clients) getAWSMDSClient() error {
@@ -302,16 +294,6 @@ func (c *Clients) getBaseFromInputTag(inputTag, instanceID string) (string, erro
 	}
 
 	return "", fmt.Errorf("Instance doesn't contain input-tag '%s'", inputTag)
-}
-
-func analyzeEC2APIErrors(err error) string {
-	if err != nil {
-		if aerr, ok := err.(awserr.Error); ok {
-			return aerr.Error()
-		}
-		return err.Error()
-	}
-	return ""
 }
 
 func setSystemHostname(hostname string) error {
@@ -584,9 +566,4 @@ func updateHostsFile(hostname string) error {
 	hosts.AddHost("127.0.0.1", hostname)
 
 	return hosts.Save()
-}
-
-func exit(err error) error {
-	log.Debugf("Executed in %s, exiting..", time.Since(start))
-	return err
 }

@@ -1,20 +1,28 @@
-package main
+package cli
 
 import (
+	"os"
+	"time"
+
+	"github.com/mvisonneau/ahs/cmd"
+
 	"github.com/urfave/cli"
 )
 
-var version = "<devel>"
+// Run handles the instanciation of the CLI application
+func Run(version string) {
+	NewApp(version, time.Now()).Run(os.Args)
+}
 
-// runCli : Generates cli configuration for the application
-func runCli() (c *cli.App) {
-	c = cli.NewApp()
-	c.Name = "ahs"
-	c.Version = version
-	c.Usage = "Set the hostname of an EC2 instance based on a tag value and the instance-id"
-	c.EnableBashCompletion = true
+// NewApp configures the CLI application
+func NewApp(version string, start time.Time) (app *cli.App) {
+	app = cli.NewApp()
+	app.Name = "ahs"
+	app.Version = version
+	app.Usage = "Set the hostname of an EC2 instance based on a tag value and the instance-id"
+	app.EnableBashCompletion = true
 
-	c.Flags = []cli.Flag{
+	app.Flags = []cli.Flag{
 		cli.BoolFlag{
 			Name:   "dry-run",
 			EnvVar: "AHS_DRY_RUN",
@@ -62,7 +70,7 @@ func runCli() (c *cli.App) {
 		},
 	}
 
-	c.Commands = []cli.Command{
+	app.Commands = []cli.Command{
 		{
 			Name:      "instance-id",
 			Usage:     "compute a hostname by appending the instance-id to a prefixed/base string",
@@ -75,7 +83,7 @@ func runCli() (c *cli.App) {
 					Value:  5,
 				},
 			},
-			Action: run,
+			Action: cmd.ExecWrapper(cmd.Run),
 		},
 		{
 			Name:      "sequential",
@@ -100,8 +108,12 @@ func runCli() (c *cli.App) {
 					Usage:  "if instances are provisioned through an ASG, setting this flag it will get the sequential-ids associated to respective azs",
 				},
 			},
-			Action: run,
+			Action: cmd.ExecWrapper(cmd.Run),
 		},
+	}
+
+	app.Metadata = map[string]interface{}{
+		"startTime": start,
 	}
 
 	return
