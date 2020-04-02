@@ -19,5 +19,4 @@ func TestAnalyzeEC2APIError(t *testing.T) {
 
 	err := errors.New("test")
 	assert.Equal(t, err.Error(), analyzeEC2APIError(err))
-	err.Error()
 }
