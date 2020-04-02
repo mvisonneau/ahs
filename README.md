@@ -1,4 +1,4 @@
-# 🏷 ahs - Amazon Hostname Setter
+# 🏷 ahs - AWS EC2 Hostname Setter
 
 [![GoDoc](https://godoc.org/github.com/mvisonneau/ahs?status.svg)](https://godoc.org/github.com/mvisonneau/ahs)
 [![Go Report Card](https://goreportcard.com/badge/github.com/mvisonneau/ahs)](https://goreportcard.com/report/github.com/mvisonneau/ahs)
@@ -67,9 +67,9 @@ For the following ones, you need to know which version you want to install, to f
 ```
 
 ```bash
-# Binary (eg: freebsd/amd64)
-~$ wget https://github.com/mvisonneau/ahs/releases/download/${AHS_VERSION}/ahs_${AHS_VERSION}_freebsd_amd64.tar.gz
-~$ tar zxvf ahs_${AHS_VERSION}_freebsd_amd64.tar.gz -C /usr/local/bin
+# Binary (eg: linux/amd64)
+~$ wget https://github.com/mvisonneau/ahs/releases/download/${AHS_VERSION}/ahs_${AHS_VERSION}_linux_amd64.tar.gz
+~$ tar zxvf ahs_${AHS_VERSION}_linux_amd64.tar.gz -C /usr/local/bin
 
 # DEB package (eg: linux/386)
 ~$ wget https://github.com/mvisonneau/ahs/releases/download/${AHS_VERSION}/ahs_${AHS_VERSION}_linux_386.deb
