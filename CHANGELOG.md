@@ -7,6 +7,8 @@ and this project adheres to [0ver](https://0ver.org).
 
 ## [Unreleased]
 
+## [0.2.4] - 2020-04-02
+
 ### Added
 
 - Release binaries using goreleaser
@@ -124,7 +126,8 @@ and this project adheres to [0ver](https://0ver.org).
 - License
 - Readme
 
-[Unreleased]: https://github.com/mvisonneau/ahs/compare/0.2.3...HEAD
+[Unreleased]: https://github.com/mvisonneau/ahs/compare/0.2.4...HEAD
+[0.2.4]: https://github.com/mvisonneau/ahs/tree/0.2.4
 [0.2.3]: https://github.com/mvisonneau/ahs/tree/0.2.3
 [0.2.2]: https://github.com/mvisonneau/ahs/tree/0.2.2
 [0.2.1]: https://github.com/mvisonneau/ahs/tree/0.2.1
