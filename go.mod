@@ -3,7 +3,7 @@ module github.com/mvisonneau/ahs
 go 1.12
 
 require (
-	github.com/aws/aws-sdk-go v1.34.9
+	github.com/aws/aws-sdk-go v1.34.27
 	github.com/jpillora/backoff v1.0.0
 	github.com/mvisonneau/go-helpers v0.0.0-20200224131125-cb5cc4e6def9
 	github.com/sirupsen/logrus v1.6.0
