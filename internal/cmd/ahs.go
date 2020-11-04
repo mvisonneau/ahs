@@ -10,7 +10,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -21,7 +20,7 @@ import (
 	"github.com/jpillora/backoff"
 	log "github.com/sirupsen/logrus"
 	"github.com/txn2/txeh"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 const (
@@ -73,9 +72,9 @@ func Run(ctx *cli.Context) (int, error) {
 			Factor: 2,
 			Jitter: false,
 		},
-		InputTag:  ctx.GlobalString("input-tag"),
-		OutputTag: ctx.GlobalString("output-tag"),
-		Separator: ctx.GlobalString("separator"),
+		InputTag:  ctx.String("input-tag"),
+		OutputTag: ctx.String("output-tag"),
+		Separator: ctx.String("separator"),
 	}
 
 	c := &Clients{}
@@ -161,20 +160,20 @@ func Run(ctx *cli.Context) (int, error) {
 		return 1, err
 	}
 
-	if !ctx.GlobalBool("dry-run") {
+	if !ctx.Bool("dry-run") {
 		log.Infof("Setting instance hostname locally")
 		if err := setSystemHostname(v.Hostname); err != nil {
 			return 1, err
 		}
 
-		if ctx.GlobalBool("persist-hostname") {
+		if ctx.Bool("persist-hostname") {
 			log.Infof("Persist hostname in /etc/hostname")
 			if err := updateHostnameFile(v.Hostname); err != nil {
 				return 1, err
 			}
 		}
 
-		if ctx.GlobalBool("persist-hosts") {
+		if ctx.Bool("persist-hosts") {
 			log.Infof("Persist hostname in /etc/hosts")
 			if err := updateHostsFile(v.Hostname); err != nil {
 				return 1, err
@@ -295,10 +294,6 @@ func (c *Clients) getBaseFromInputTag(inputTag, instanceID string) (string, erro
 	}
 
 	return "", fmt.Errorf("Instance doesn't contain input-tag '%s'", inputTag)
-}
-
-func setSystemHostname(hostname string) error {
-	return syscall.Sethostname([]byte(hostname))
 }
 
 func getSystemHostname() (string, error) {

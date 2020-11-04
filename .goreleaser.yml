@@ -3,7 +3,8 @@ before:
     - go mod download
 
 builds:
-  - env:
+  - main: ./cmd/ahs
+    env:
       - CGO_ENABLED=0
     goos:
       - linux
@@ -11,26 +12,36 @@ builds:
       - 386
       - amd64
       - arm64
+    flags:
+      - -trimpath
+
+archives:
+  - name_template: '{{ .ProjectName }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}'
 
 nfpms:
-  - maintainer: &author
-      Maxime VISONNEAU <maxime.visonneau@gmail.com>
-    description: &description
-      Amazon EC2 Hostname Setter
-    license: &license
-      Apache 2.0
-    homepage: &homepage
-      https://github.com/mvisonneau/ahs
+  - maintainer: &author Maxime VISONNEAU <maxime.visonneau@gmail.com>
+    description: &description Amazon EC2 Hostname Setter
+    license: &license Apache 2.0
+    homepage: &homepage https://github.com/mvisonneau/ahs
     vendor: *author
     formats:
       - deb
       - rpm
 
+brews:
+  - description: *description
+    homepage: *homepage
+    folder: Formula
+    tap:
+      owner: mvisonneau
+      name: homebrew-tap
+
 checksum:
-  name_template: checksums.txt
+  name_template: '{{ .ProjectName }}_v{{ .Version }}_SHA256SUMS'
+  algorithm: sha256
 
 snapshot:
-  name_template: "{{ .Tag }}-{{ .ShortCommit }}"
+  name_template: '{{ .Tag }}-{{ .ShortCommit }}'
 
 changelog:
   skip: true

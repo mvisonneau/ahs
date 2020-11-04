@@ -2,3 +2,4 @@ ahs
 dist
 vendor
 coverage.out
+!cmd/ahs

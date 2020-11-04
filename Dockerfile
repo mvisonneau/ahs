@@ -2,7 +2,7 @@
 # BUILD CONTAINER
 ##
 
-FROM goreleaser/goreleaser:v0.142.0 as builder
+FROM goreleaser/goreleaser:v0.146.0 as builder
 
 WORKDIR /build
 
@@ -15,10 +15,11 @@ make build-linux-amd64
 # RELEASE CONTAINER
 ##
 
-FROM busybox:1.32.0-glibc
+FROM busybox:1.32-glibc
 
 WORKDIR /
 
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /build/dist/ahs_linux_amd64/ahs /usr/local/bin/
 
 ENTRYPOINT ["/usr/local/bin/ahs"]

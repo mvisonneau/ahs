@@ -1,6 +1,6 @@
 # 🏷 ahs - AWS EC2 Hostname Setter
 
-[![GoDoc](https://godoc.org/github.com/mvisonneau/ahs?status.svg)](https://godoc.org/github.com/mvisonneau/ahs)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/mvisonneau/ahs)](https://pkg.go.dev/mod/github.com/mvisonneau/ahs)
 [![Go Report Card](https://goreportcard.com/badge/github.com/mvisonneau/ahs)](https://goreportcard.com/report/github.com/mvisonneau/ahs)
 [![Docker Pulls](https://img.shields.io/docker/pulls/mvisonneau/ahs.svg)](https://hub.docker.com/r/mvisonneau/ahs/)
 [![Build Status](https://cloud.drone.io/api/badges/mvisonneau/ahs/status.svg)](https://cloud.drone.io/mvisonneau/ahs)
@@ -90,9 +90,6 @@ NAME:
 USAGE:
    ahs [global options] command [command options] [arguments...]
 
-VERSION:
-   <devel>
-
 COMMANDS:
      instance-id  compute a hostname by appending the instance-id to a prefixed/base string
      sequential   compute a sequential hostname based on the number of instances belonging to the same group
@@ -104,8 +101,6 @@ GLOBAL OPTIONS:
    --log-level level      log level (debug,info,warn,fatal,panic) (default: "info") [$AHS_LOG_LEVEL]
    --log-format format    log format (json,text) (default: "text") [$AHS_LOG_FORMAT]
    --output-tag tag       tag to update with the computed hostname (default: "Name") [$AHS_OUTPUT_TAG]
-   --persist-hostname     set /etc/hostname with generated hostname [$AHS_PERSIST_HOSTNAME]
-   --persist-hosts        assign generated hostname to 127.0.0.1 in /etc/hosts [$AHS_PERSIST_HOSTS]
    --separator separator  separator to use between tag and id (default: "-") [$AHS_SEPARATOR]
    --help, -h             show help
    --version, -v          print the version
@@ -155,9 +150,12 @@ all                            Test, builds and ship package for all supported p
 build-local                    Build the binaries using local GOOS
 build                          Build the binaries
 clean                          Remove binary if it exists
+coverage-html                  Generates coverage report and displays it in the browser
 coverage                       Generates coverage report
+dev-env                        Build a local development environment using Docker
 fmt                            Format source code
 goimports                      Test code syntax with goimports
+gosec                          Test code for security vulnerabilities
 help                           Displays this help
 ineffassign                    Test code syntax for ineffassign
 install                        Build and install locally the binary (dev purpose)
@@ -168,7 +166,6 @@ publish-coveralls              Publish coverage results on coveralls
 release                        Build & release the binaries
 revive                         Test code syntax with revive
 setup                          Install required libraries/tools for build tasks
-show-coverage                  Display coverage report in browser
 sign-drone                     Sign Drone CI configuration
 test                           Run the tests against the codebase
 vet                            Test code syntax with go vet

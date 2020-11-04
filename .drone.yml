@@ -4,15 +4,15 @@ name: test
 
 steps:
   - name: lint
-    image: golang:1.14
+    image: golang:1.15
     commands:
       - make lint
   - name: test
-    image: golang:1.14
+    image: golang:1.15
     commands:
       - make test
   - name: build
-    image: goreleaser/goreleaser:v0.130.2
+    image: goreleaser/goreleaser:v0.146.0
     commands:
       - apk add --no-cache make
       - make build
@@ -38,7 +38,7 @@ name: coverage
 
 steps:
   - name: coverage
-    image: golang:1.14
+    image: golang:1.15
     environment:
       COVERALLS_TOKEN:
         from_secret: COVERALLS_TOKEN
@@ -64,13 +64,18 @@ steps:
       - git fetch --tags
 
   - name: release
-    image: goreleaser/goreleaser:v0.130.2
+    image: goreleaser/goreleaser:v0.146.0
     environment:
       GITHUB_TOKEN:
         from_secret: GITHUB_TOKEN
     commands:
       - apk add --no-cache make
       - make release
+
+  - name: gopkg-refresh
+    image: curlimages/curl
+    commands:
+      - curl https://sum.golang.org/lookup/github.com/mvisonneau/ahs@${DRONE_TAG}
 
 trigger:
   repo:
@@ -81,8 +86,9 @@ trigger:
 depends_on:
   - test
   - coverage
+
 ---
 kind: signature
-hmac: d85aee1da87e2b1865b042c163b3fe478ea65caa0f6ee7f72905ab8ba72aa6f3
+hmac: 0c683f8670639adf323671178a003342b0833c9b0d541c8d91af0e9ad459af04
 
 ...

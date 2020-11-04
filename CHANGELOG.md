@@ -7,6 +7,19 @@ and this project adheres to [0ver](https://0ver.org).
 
 ## [Unreleased]
 
+### Added
+
+- gosec tests
+
+### Changed
+
+- Refactored codebase using golang standardized filestructure
+- Prefix new releases with `^v` to make pkg.go.dev happy
+- Fixed ca-certificates in the container image
+- Bumped urfave/cli to v2
+- Bumped to go 1.15
+- Bumped every other dependencies
+
 ## [0.2.4] - 2020-04-02
 
 ### Added

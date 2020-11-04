@@ -5,9 +5,8 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/mvisonneau/go-helpers/logger"
-	"github.com/urfave/cli"
-
 	log "github.com/sirupsen/logrus"
+	"github.com/urfave/cli/v2"
 )
 
 var start time.Time
@@ -15,21 +14,10 @@ var start time.Time
 func configure(ctx *cli.Context) error {
 	start = ctx.App.Metadata["startTime"].(time.Time)
 
-	lc := &logger.Config{
-		Level:  ctx.GlobalString("log-level"),
-		Format: ctx.GlobalString("log-format"),
-	}
-
-	return lc.Configure()
-}
-
-func exit(exitCode int, err error) *cli.ExitError {
-	defer log.Debugf("Executed in %s, exiting..", time.Since(start))
-	if err != nil {
-		log.Error(analyzeEC2APIError(err))
-	}
-
-	return cli.NewExitError("", exitCode)
+	return logger.Configure(logger.Config{
+		Level:  ctx.String("log-level"),
+		Format: ctx.String("log-format"),
+	})
 }
 
 func analyzeEC2APIError(err error) string {
@@ -42,8 +30,22 @@ func analyzeEC2APIError(err error) string {
 	return ""
 }
 
+func exit(exitCode int, err error) cli.ExitCoder {
+	defer log.WithFields(
+		log.Fields{
+			"execution-time": time.Since(start),
+		},
+	).Debug("exited..")
+
+	if err != nil {
+		log.Error(err.Error())
+	}
+
+	return cli.NewExitError("", exitCode)
+}
+
 // ExecWrapper gracefully logs and exits our `run` functions
-func ExecWrapper(f func(ctx *cli.Context) (int, error)) func(*cli.Context) error {
+func ExecWrapper(f func(ctx *cli.Context) (int, error)) cli.ActionFunc {
 	return func(ctx *cli.Context) error {
 		return exit(f(ctx))
 	}
