@@ -9,25 +9,25 @@ import (
 )
 
 func TestComputeHostnameWithInstanceID(t *testing.T) {
-	hostname, err := computeHostnameWithInstanceID("myhostname", "-", "i-123456789", 5)
-	assert.Nil(t, err)
-	assert.Equal(t, "myhostname-12345", hostname)
+	tests := []struct {
+		expectedResult string
 
-	hostname, err = computeHostnameWithInstanceID("myhostname-12345", "-", "i-123456789", 5)
-	assert.Nil(t, err)
-	assert.Equal(t, "myhostname-12345", hostname)
-
-	hostname, err = computeHostnameWithInstanceID("myhostname-12345", "-", "i-123456789", 100)
-	assert.Nil(t, err)
-	assert.Equal(t, "myhostname-123456789", hostname)
-
-	hostname, err = computeHostnameWithInstanceID("myhostname-12345", "-", "i-123456789", -1)
-	assert.Nil(t, err)
-	assert.Equal(t, "myhostname-123456789", hostname)
-
-	hostname, err = computeHostnameWithInstanceID("my-host-name-12345", "-", "i-123456789", 5)
-	assert.Nil(t, err)
-	assert.Equal(t, "my-host-name-12345", hostname)
+		hostname   string
+		separator  string
+		instanceID string
+		length     int
+	}{
+		{"myhostname-12345", "myhostname", "-", "i-123456789", 5},
+		{"myhostname-12345", "myhostname-12345", "-", "i-123456789", 5},
+		{"myhostname-123456789", "myhostname-12345", "-", "i-123456789", 100},
+		{"myhostname-123456789", "myhostname-12345", "-", "i-123456789", -1},
+		{"my-host-name-12345", "my-host-name-12345", "-", "i-123456789", 5},
+	}
+	for _, tt := range tests {
+		hostname, err := computeHostnameWithInstanceID(tt.hostname, tt.separator, tt.instanceID, tt.length)
+		assert.Nil(t, err)
+		assert.Equal(t, tt.expectedResult, hostname)
+	}
 }
 
 func TestValidComputeRegionFromAZ(t *testing.T) {
