@@ -24,6 +24,7 @@ nfpms:
     license: &license Apache 2.0
     homepage: &homepage https://github.com/mvisonneau/ahs
     vendor: *author
+    file_name_template: '{{ .ProjectName }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}'
     formats:
       - deb
       - rpm
