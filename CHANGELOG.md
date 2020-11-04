@@ -7,6 +7,8 @@ and this project adheres to [0ver](https://0ver.org).
 
 ## [Unreleased]
 
+## [v0.2.5] - 2020-10-04
+
 ### Added
 
 - gosec tests
@@ -16,6 +18,7 @@ and this project adheres to [0ver](https://0ver.org).
 - Refactored codebase using golang standardized filestructure
 - Prefix new releases with `^v` to make pkg.go.dev happy
 - Fixed ca-certificates in the container image
+- Fixed a bug causing panics when `--length` exceeds actual instance-id length
 - Bumped urfave/cli to v2
 - Bumped to go 1.15
 - Bumped every other dependencies
@@ -139,7 +142,8 @@ and this project adheres to [0ver](https://0ver.org).
 - License
 - Readme
 
-[Unreleased]: https://github.com/mvisonneau/ahs/compare/0.2.4...HEAD
+[Unreleased]: https://github.com/mvisonneau/ahs/compare/v0.2.5...HEAD
+[v0.2.5]: https://github.com/mvisonneau/ahs/tree/v0.2.5
 [0.2.4]: https://github.com/mvisonneau/ahs/tree/0.2.4
 [0.2.3]: https://github.com/mvisonneau/ahs/tree/0.2.3
 [0.2.2]: https://github.com/mvisonneau/ahs/tree/0.2.2
