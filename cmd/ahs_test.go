@@ -16,6 +16,18 @@ func TestComputeHostnameWithInstanceID(t *testing.T) {
 	hostname, err = computeHostnameWithInstanceID("myhostname-12345", "-", "i-123456789", 5)
 	assert.Nil(t, err)
 	assert.Equal(t, "myhostname-12345", hostname)
+
+	hostname, err = computeHostnameWithInstanceID("myhostname-12345", "-", "i-123456789", 100)
+	assert.Nil(t, err)
+	assert.Equal(t, "myhostname-123456789", hostname)
+
+	hostname, err = computeHostnameWithInstanceID("myhostname-12345", "-", "i-123456789", -1)
+	assert.Nil(t, err)
+	assert.Equal(t, "myhostname-123456789", hostname)
+
+	hostname, err = computeHostnameWithInstanceID("my-host-name-12345", "-", "i-123456789", 5)
+	assert.Nil(t, err)
+	assert.Equal(t, "my-host-name-12345", hostname)
 }
 
 func TestValidComputeRegionFromAZ(t *testing.T) {
