@@ -7,7 +7,7 @@ require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/jpillora/backoff v1.0.0
 	github.com/mvisonneau/go-helpers v0.0.0-20201013090751-e69b7251ab02
-	github.com/sirupsen/logrus v1.7.0
+	github.com/sirupsen/logrus v1.8.0
 	github.com/stretchr/testify v1.6.1
 	github.com/txn2/txeh v1.3.0
 	github.com/urfave/cli/v2 v2.3.0
