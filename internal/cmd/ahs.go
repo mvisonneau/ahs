@@ -334,6 +334,11 @@ func computeHostnameWithInstanceID(base, separator, instanceID string, length in
 	if len(splitHost) <= 1 {
 		splitIndex = 1
 	}
+	hostnameIncluded := strings.Contains(awsInstanceID, splitHost[len(splitHost)-1])
+	if !hostnameIncluded {
+		splitIndex = len(splitHost)
+	}
+
 	hostnamePrefix := strings.Join(splitHost[:splitIndex], separator)
 	hostname := strings.Join([]string{hostnamePrefix, truncatedID}, separator)
 
