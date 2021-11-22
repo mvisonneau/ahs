@@ -13,10 +13,10 @@ setup: ## Install required libraries/tools for build tasks
 
 .PHONY: fmt
 fmt: setup ## Format source code
-	goimports -w $(FILES)
+	gofumpt -w $(FILES)
 
 .PHONY: lint
-lint: revive vet goimports ineffassign misspell gosec ## Run all lint related tests against the codebase
+lint: revive vet gofumpt ineffassign misspell gosec ## Run all lint related tests against the codebase
 
 .PHONY: revive
 revive: setup ## Test code syntax with revive
@@ -26,10 +26,10 @@ revive: setup ## Test code syntax with revive
 vet: ## Test code syntax with go vet
 	go vet ./...
 
-.PHONY: goimports
-goimports: setup ## Test code syntax with goimports
-	goimports -d $(FILES) > goimports.out
-	@if [ -s goimports.out ]; then cat goimports.out; rm goimports.out; exit 1; else rm goimports.out; fi
+.PHONY: gofumpt
+gofumpt: setup ## Test code syntax with gofumpt
+	gofumpt -d $(FILES) > gofumpt.out
+	@if [ -s gofumpt.out ]; then cat gofumpt.out; rm gofumpt.out; exit 1; else rm gofumpt.out; fi
 
 .PHONY: ineffassign
 ineffassign: setup ## Test code syntax for ineffassign
@@ -41,7 +41,7 @@ misspell: setup ## Test code with misspell
 
 .PHONY: gosec
 gosec: setup ## Test code for security vulnerabilities
-	gosec --exclude G306 ./...
+	gosec -exclude G306 ./...
 
 .PHONY: test
 test: ## Run the tests against the codebase
@@ -51,25 +51,22 @@ test: ## Run the tests against the codebase
 install: ## Build and install locally the binary (dev purpose)
 	go install ./cmd/$(NAME)
 
-.PHONY: build-local
-build-local: ## Build the binaries using local GOOS
+.PHONY: build
+build: ## Build the binaries using local GOOS
 	go build ./cmd/$(NAME)
 
-.PHONY: build
-build: ## Build the binaries
-	goreleaser release --snapshot --skip-publish --rm-dist
-
-.PHONY: build-linux-amd64
-build-linux-amd64: ## Build the binaries
-	goreleaser release --snapshot --skip-publish --rm-dist -f .goreleaser.linux-amd64.yml
-
 .PHONY: release
-release: ## Build & release the binaries
+release: ## Build & release the binaries (stable)
+	git tag -d edge
 	goreleaser release --rm-dist
 
-.PHONY: publish-coveralls
-publish-coveralls: setup ## Publish coverage results on coveralls
-	goveralls -service drone.io -coverprofile=coverage.out
+.PHONY: prerelease
+prerelease: setup ## Build & prerelease the binaries (edge)
+	@\
+		REPOSITORY=$(REPOSITORY) \
+		NAME=$(NAME) \
+		GITHUB_TOKEN=$(GITHUB_TOKEN) \
+		.github/prerelease.sh
 
 .PHONY: clean
 clean: ## Remove binary if it exists

@@ -277,7 +277,6 @@ func (c *Clients) getBaseFromInputTag(inputTag, instanceID string) (string, erro
 			},
 		},
 	})
-
 	if err != nil {
 		return "", err
 	}
@@ -396,7 +395,6 @@ func (c *Clients) findInstanceGroupTagValue(groupTag, instanceID string) (string
 			},
 		},
 	})
-
 	if err != nil {
 		return "", err
 	}
@@ -414,7 +412,6 @@ func (c *Clients) getASG(asgName string) (*autoscaling.Group, error) {
 	asgs, err := c.Autoscaling.DescribeAutoScalingGroups(&autoscaling.DescribeAutoScalingGroupsInput{
 		AutoScalingGroupNames: []*string{&asgName},
 	})
-
 	if err != nil {
 		return nil, err
 	}
@@ -459,7 +456,6 @@ func (c *Clients) findAvailableSequentialIDPerRegion(instanceGroup, groupTag, se
 			},
 		},
 	})
-
 	if err != nil {
 		return -1, err
 	}
@@ -496,14 +492,13 @@ func (c *Clients) findAvailableSequentialIDPerAZ(instanceAZ, instanceGroup, grou
 			},
 		},
 	})
-
 	if err != nil {
 		return -1, err
 	}
 
 	// Get an offset based on the letter of the AZ
 	var offset int
-	var azList = []string{"a", "b", "c", "d", "e", "f"}
+	azList := []string{"a", "b", "c", "d", "e", "f"}
 	for i := range azList {
 		if instanceAZ[len(instanceAZ)-1:] == azList[i] {
 			offset = i + 1
@@ -577,7 +572,7 @@ func computeMostAdequateSequentialID(instances *ec2.DescribeInstancesOutput, seq
 }
 
 func updateHostnameFile(hostname string) error {
-	return ioutil.WriteFile("/etc/hostname", []byte(hostname+"\n"), 0644)
+	return ioutil.WriteFile("/etc/hostname", []byte(hostname+"\n"), 0o644)
 }
 
 func updateHostsFile(hostname string) error {
