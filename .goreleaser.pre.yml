@@ -15,37 +15,13 @@ builds:
     flags:
       - -trimpath
 
-nfpms:
-  - maintainer: &author Maxime VISONNEAU <maxime.visonneau@gmail.com>
-    description: &description Amazon EC2 Hostname Setter
-    license: &license Apache 2.0
-    homepage: &homepage https://github.com/mvisonneau/ahs
-    vendor: *author
-    file_name_template: '{{ .ProjectName }}_{{ .Tag }}_{{ .Os }}_{{ .Arch }}'
-    formats:
-      - deb
-      - rpm
-
-brews:
-  - description: *description
-    homepage: *homepage
-    folder: Formula
-    tap:
-      owner: mvisonneau
-      name: homebrew-tap
-
-scoop:
-  description: *description
-  homepage: *homepage
-  license: *license
-  bucket:
-    owner: mvisonneau
-    name: scoops
+release:
+  disable: true
 
 dockers:
   - image_templates:
-      - 'docker.io/mvisonneau/ahs:{{ .Tag }}-amd64'
-      - 'ghcr.io/mvisonneau/ahs:{{ .Tag }}-amd64'
+      - 'docker.io/mvisonneau/ahs:latest-amd64'
+      - 'ghcr.io/mvisonneau/ahs:latest-amd64'
     ids: [ahs]
     goarch: amd64
     use: buildx
@@ -61,8 +37,8 @@ dockers:
       - --label=org.opencontainers.image.licenses=Apache-2.0
 
   - image_templates:
-      - 'docker.io/mvisonneau/ahs:{{ .Tag }}-arm64v8'
-      - 'ghcr.io/mvisonneau/ahs:{{ .Tag }}-arm64v8'
+      - 'docker.io/mvisonneau/ahs:latest-arm64v8'
+      - 'ghcr.io/mvisonneau/ahs:latest-arm64v8'
     ids: [ahs]
     goarch: arm64
     use: buildx
@@ -78,19 +54,15 @@ dockers:
       - --label=org.opencontainers.image.licenses=Apache-2.0
 
 docker_manifests:
-  - name_template: docker.io/mvisonneau/ahs:{{ .Tag }}
+  - name_template: docker.io/mvisonneau/ahs:latest
     image_templates:
-      - docker.io/mvisonneau/ahs:{{ .Tag }}-amd64
-      - docker.io/mvisonneau/ahs:{{ .Tag }}-arm64v8
+      - docker.io/mvisonneau/ahs:latest-amd64
+      - docker.io/mvisonneau/ahs:latest-arm64v8
 
-  - name_template: ghcr.io/mvisonneau/ahs:{{ .Tag }}
+  - name_template: ghcr.io/mvisonneau/ahs:latest
     image_templates:
-      - ghcr.io/mvisonneau/ahs:{{ .Tag }}-amd64
-      - ghcr.io/mvisonneau/ahs:{{ .Tag }}-arm64v8
-
-checksum:
-  name_template: '{{ .ProjectName }}_{{ .Tag }}_sha512sums.txt'
-  algorithm: sha512
+      - ghcr.io/mvisonneau/ahs:latest-amd64
+      - ghcr.io/mvisonneau/ahs:latest-arm64v8
 
 signs:
   - artifacts: checksum
@@ -103,6 +75,10 @@ signs:
         '--detach-sign',
         '${artifact}',
       ]
+
+checksum:
+  name_template: '{{ .ProjectName }}_edge_sha512sums.txt'
+  algorithm: sha512
 
 changelog:
   skip: true

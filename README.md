@@ -38,7 +38,7 @@ INFO[2018-07-23T11:56:00Z] Setting instance sequential id (1) on configured tag 
 
 You can also use a *Dockerized version* if you prefer :
 
-```
+```bash
 ~$ docker run -it --rm --privileged mvisonneau/ahs <instance-id|sequential>
 ```
 
@@ -166,7 +166,6 @@ publish-coveralls              Publish coverage results on coveralls
 release                        Build & release the binaries
 revive                         Test code syntax with revive
 setup                          Install required libraries/tools for build tasks
-sign-drone                     Sign Drone CI configuration
 test                           Run the tests against the codebase
 vet                            Test code syntax with go vet
 ```

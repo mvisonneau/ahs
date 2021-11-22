@@ -7,6 +7,12 @@ and this project adheres to [0ver](https://0ver.org).
 
 ## [Unreleased]
 
+### Changed
+
+- Fixed a bug preventing dashes to be interpreted correctly in hostnames
+- Moved CI from Drone to GitHub actions
+- Bumped dependencies and golang to 1.17
+
 ## [v0.2.5] - 2020-10-04
 
 ### Added

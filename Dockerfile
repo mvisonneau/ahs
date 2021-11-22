@@ -2,25 +2,24 @@
 # BUILD CONTAINER
 ##
 
-FROM goreleaser/goreleaser:v0.147.2 as builder
+FROM alpine:3.14.3 as certs
 
-WORKDIR /build
-
-COPY . .
 RUN \
-apk add --no-cache make ;\
-make build-linux-amd64
+  apk add --no-cache ca-certificates
 
 ##
 # RELEASE CONTAINER
 ##
 
-FROM busybox:1.32-glibc
+FROM busybox:1.34.1-glibc
 
 WORKDIR /
 
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder /build/dist/ahs_linux_amd64/ahs /usr/local/bin/
+COPY --from=certs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY ahs /usr/local/bin/
+
+# Run as nobody user
+USER 65534
 
 ENTRYPOINT ["/usr/local/bin/ahs"]
 CMD [""]
