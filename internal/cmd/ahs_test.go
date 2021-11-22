@@ -21,6 +21,7 @@ func TestComputeHostnameWithInstanceID(t *testing.T) {
 		{"myhostname-12345", "myhostname-12345", "-", "i-123456789", 5},
 		{"myhostname-123456789", "myhostname-12345", "-", "i-123456789", 100},
 		{"myhostname-123456789", "myhostname-12345", "-", "i-123456789", -1},
+		{"my-host-name-123456789", "my-host-name", "-", "i-123456789", -1},
 		{"my-host-name-12345", "my-host-name-12345", "-", "i-123456789", 5},
 	}
 	for _, tt := range tests {
