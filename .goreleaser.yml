@@ -34,14 +34,6 @@ brews:
       owner: mvisonneau
       name: homebrew-tap
 
-scoop:
-  description: *description
-  homepage: *homepage
-  license: *license
-  bucket:
-    owner: mvisonneau
-    name: scoops
-
 dockers:
   - image_templates:
       - 'docker.io/mvisonneau/ahs:{{ .Tag }}-amd64'

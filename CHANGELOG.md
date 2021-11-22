@@ -7,6 +7,8 @@ and this project adheres to [0ver](https://0ver.org).
 
 ## [Unreleased]
 
+## [v0.2.6] - 2021-11-22
+
 ### Changed
 
 - Fixed a bug preventing dashes to be interpreted correctly in hostnames
@@ -148,7 +150,8 @@ and this project adheres to [0ver](https://0ver.org).
 - License
 - Readme
 
-[Unreleased]: https://github.com/mvisonneau/ahs/compare/v0.2.5...HEAD
+[Unreleased]: https://github.com/mvisonneau/ahs/compare/v0.2.6...HEAD
+[v0.2.6]: https://github.com/mvisonneau/ahs/tree/v0.2.6
 [v0.2.5]: https://github.com/mvisonneau/ahs/tree/v0.2.5
 [0.2.4]: https://github.com/mvisonneau/ahs/tree/0.2.4
 [0.2.3]: https://github.com/mvisonneau/ahs/tree/0.2.3
