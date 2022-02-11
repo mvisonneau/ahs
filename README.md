@@ -49,7 +49,13 @@ Have a look onto the [latest release page](https://github.com/mvisonneau/ahs/rel
 ### Go
 
 ```bash
-~$ go get -u github.com/mvisonneau/ahs
+~$ go install github.com/mvisonneau/ahs/cmd/ahs@latest
+```
+
+### Homebrew
+
+```bash
+~$ brew install mvisonneau/tap/ahs
 ```
 
 ### Docker

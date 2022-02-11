@@ -7,6 +7,17 @@ and this project adheres to [0ver](https://0ver.org).
 
 ## [Unreleased]
 
+## [v0.2.7] - 2022-02-11
+
+### Added
+
+- darwin/macos releases
+- quay.io releases
+ 
+### Changed
+
+- Bumped most dependencies
+
 ## [v0.2.6] - 2021-11-22
 
 ### Changed
@@ -150,7 +161,8 @@ and this project adheres to [0ver](https://0ver.org).
 - License
 - Readme
 
-[Unreleased]: https://github.com/mvisonneau/ahs/compare/v0.2.6...HEAD
+[Unreleased]: https://github.com/mvisonneau/ahs/compare/v0.2.7...HEAD
+[v0.2.7]: https://github.com/mvisonneau/ahs/tree/v0.2.7
 [v0.2.6]: https://github.com/mvisonneau/ahs/tree/v0.2.6
 [v0.2.5]: https://github.com/mvisonneau/ahs/tree/v0.2.5
 [0.2.4]: https://github.com/mvisonneau/ahs/tree/0.2.4
