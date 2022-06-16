@@ -6,20 +6,19 @@ import (
 	"time"
 
 	"github.com/mvisonneau/ahs/internal/cmd"
-
 	"github.com/urfave/cli/v2"
 )
 
-// Run handles the instanciation of the CLI application
+// Run handles the instanciation of the CLI application.
 func Run(version string, args []string) {
 	err := NewApp(version, time.Now()).Run(args)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println(err) //nolint
 		os.Exit(1)
 	}
 }
 
-// NewApp configures the CLI application
+// NewApp configures the CLI application.
 func NewApp(version string, start time.Time) (app *cli.App) {
 	app = cli.NewApp()
 	app.Name = "ahs"
@@ -110,7 +109,7 @@ func NewApp(version string, start time.Time) (app *cli.App) {
 				&cli.BoolFlag{
 					Name:    "respect-azs",
 					EnvVars: []string{"AHS_RESPECT_AZS"},
-					Usage:   "if instances are provisioned through an ASG, setting this flag it will get the sequential-ids associated to respective azs",
+					Usage:   "if instances are provisioned through an ASG, setting this flag it will get the sequential-ids associated to respective azs", //nolint
 				},
 			},
 			Action: cmd.ExecWrapper(cmd.Run),

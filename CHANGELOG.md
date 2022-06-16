@@ -7,6 +7,13 @@ and this project adheres to [0ver](https://0ver.org).
 
 ## [Unreleased]
 
+### Changed
+
+- Bumped most dependencies
+- Fixed an issue causing "kebab" hostname to not be rendered correctly
+- Implemented `golangci`
+- Bumped golang to `v1.18`
+
 ## [v0.2.7] - 2022-02-11
 
 ### Added

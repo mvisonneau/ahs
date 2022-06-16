@@ -25,8 +25,10 @@ func analyzeEC2APIError(err error) string {
 		if aerr, ok := err.(awserr.Error); ok {
 			return aerr.Error()
 		}
+
 		return err.Error()
 	}
+
 	return ""
 }
 
@@ -44,7 +46,7 @@ func exit(exitCode int, err error) cli.ExitCoder {
 	return cli.NewExitError("", exitCode)
 }
 
-// ExecWrapper gracefully logs and exits our `run` functions
+// ExecWrapper gracefully logs and exits our `run` functions.
 func ExecWrapper(f func(ctx *cli.Context) (int, error)) cli.ActionFunc {
 	return func(ctx *cli.Context) error {
 		return exit(f(ctx))
