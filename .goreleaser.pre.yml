@@ -69,7 +69,7 @@ docker_manifests:
       - ghcr.io/mvisonneau/ahs:latest-amd64
       - ghcr.io/mvisonneau/ahs:latest-arm64
 
-  - name_template: ghcr.io/mvisonneau/ahs:latest
+  - name_template: quay.io/mvisonneau/ahs:latest
     image_templates:
       - quay.io/mvisonneau/ahs:latest-amd64
       - quay.io/mvisonneau/ahs:latest-arm64
