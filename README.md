@@ -36,7 +36,7 @@ INFO[2018-07-23T11:56:00Z] Setting hostname on configured instance output tag 'N
 INFO[2018-07-23T11:56:00Z] Setting instance sequential id (1) on configured tag 'ahs:instance-id'
 ```
 
-You can also use a *Dockerized version* if you prefer :
+You can also use a containerized version if you prefer:
 
 ```bash
 ~$ docker run -it --rm --privileged mvisonneau/ahs <instance-id|sequential>
@@ -97,18 +97,20 @@ USAGE:
    ahs [global options] command [command options] [arguments...]
 
 COMMANDS:
-     instance-id  compute a hostname by appending the instance-id to a prefixed/base string
-     sequential   compute a sequential hostname based on the number of instances belonging to the same group
-     help, h      Shows a list of commands or help for one command
+   instance-id  compute a hostname by appending the instance-id to a prefixed/base string
+   sequential   compute a sequential hostname based on the number of instances belonging to the same group
+   help, h      Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --dry-run              only display what would have been done [$AHS_DRY_RUN]
+   --dry-run              only display what would have been done (default: false) [$AHS_DRY_RUN]
+   --help, -h             show help (default: false)
    --input-tag tag        tag to use as input to determine the hostname (default: "Name") [$AHS_INPUT_TAG]
-   --log-level level      log level (debug,info,warn,fatal,panic) (default: "info") [$AHS_LOG_LEVEL]
    --log-format format    log format (json,text) (default: "text") [$AHS_LOG_FORMAT]
+   --log-level level      log level (debug,info,warn,fatal,panic) (default: "info") [$AHS_LOG_LEVEL]
    --output-tag tag       tag to update with the computed hostname (default: "Name") [$AHS_OUTPUT_TAG]
+   --persist-hostname     set /etc/hostname with generated hostname (default: false) [$AHS_PERSIST_HOSTNAME]
+   --persist-hosts        assign generated hostname to 127.0.0.1 in /etc/hosts (default: false) [$AHS_PERSIST_HOSTS]
    --separator separator  separator to use between tag and id (default: "-") [$AHS_SEPARATOR]
-   --help, -h             show help
    --version, -v          print the version
 ```
 
@@ -122,7 +124,7 @@ NAME:
    ahs instance-id - compute a hostname by appending the instance-id to a prefixed/base string
 
 USAGE:
-   ahs instance-id [command options]
+   ahs instance-id [command options]  
 
 OPTIONS:
    --length value  length of the id to keep in the hostname (default: 5) [$AHS_INSTANCE_ID_LENGTH]
@@ -138,12 +140,12 @@ NAME:
    ahs sequential - compute a sequential hostname based on the number of instances belonging to the same group
 
 USAGE:
-   ahs sequential [command options]
+   ahs sequential [command options]  
 
 OPTIONS:
-   --instance-sequential-id-tag value  tag to which output the computed instance-sequential-id (default: "ahs:instance-id") [$AHS_INSTANCE_SEQUENTIAL_ID_TAG]
    --instance-group-tag value          tag to use in order to determine which group the instance belongs to (default: "ahs:instance-group") [$AHS_INSTANCE_GROUP_TAG]
-   --respect-azs                       if instances are provisioned through an ASG, setting this flag it will get the sequential-ids associated to respective azs [$AHS_RESPECT_AZS]
+   --instance-sequential-id-tag value  tag to which output the computed instance-sequential-id (default: "ahs:instance-id") [$AHS_INSTANCE_SEQUENTIAL_ID_TAG]
+   --respect-azs                       if instances are provisioned through an ASG, setting this flag it will get the sequential-ids associated to respective azs (default: false) [$AHS_RESPECT_AZS]
 ```
 
 ## Develop
@@ -153,27 +155,19 @@ You can have a look at the [Makefile](/Makefile) in order to see all available o
 ```bash
 ~$ make
 all                            Test, builds and ship package for all supported platforms
-build-local                    Build the binaries using local GOOS
-build                          Build the binaries
+build                          Build the binaries using local GOOS
 clean                          Remove binary if it exists
-coverage-html                  Generates coverage report and displays it in the browser
 coverage                       Generates coverage report
-dev-env                        Build a local development environment using Docker
+coverage-html                  Generates coverage report and displays it in the browser
 fmt                            Format source code
-goimports                      Test code syntax with goimports
-gosec                          Test code for security vulnerabilities
 help                           Displays this help
-ineffassign                    Test code syntax for ineffassign
 install                        Build and install locally the binary (dev purpose)
 is-git-dirty                   Tests if git is in a dirty state
-lint                           Run all lint related tests against the codebase
-misspell                       Test code with misspell
-publish-coveralls              Publish coverage results on coveralls
-release                        Build & release the binaries
-revive                         Test code syntax with revive
+lint                           Run all lint related tests upon the codebase
+prerelease                     Build & prerelease the binaries (edge)
+release                        Build & release the binaries (stable)
 setup                          Install required libraries/tools for build tasks
 test                           Run the tests against the codebase
-vet                            Test code syntax with go vet
 ```
 
 ## Contribute
