@@ -21,16 +21,17 @@ func TestComputeHostnameWithInstanceID(t *testing.T) {
 	}{
 		"truncated hostname":                                 {"myhostname-12345", inputs{"myhostname", "-", "i-123456789", 5}},
 		"truncated hostname second-run":                      {"myhostname-12345", inputs{"myhostname-12345", "-", "i-123456789", 5}},
-		"truncated hostname expanded (length > instance id)": {"myhostname-123456789", inputs{"myhostname-12345", "-", "i-123456789", 100}},
+		"truncated hostname expanded (length > instance id)": {"myhostname-123456789", inputs{"myhostname", "-", "i-123456789", 100}},
 
-		"hostname expanded (full-length)": {"myhostname-123456789", inputs{"myhostname-12345", "-", "i-123456789", -1}},
+		"hostname expanded (full-length)": {"myhostname-123456789", inputs{"myhostname", "-", "i-123456789", -1}},
 		"kebab hostname second-run":       {"my-host-name-12345", inputs{"my-host-name-12345", "-", "i-123456789", 5}},
-		"kebab hostname expanded":         {"my-host-name-12345", inputs{"my-host-name-12", "-", "i-123456789", 5}},
+		"kebab hostname expanded":         {"my-host-name-12345", inputs{"my-host-name", "-", "i-123456789", 5}},
 
 		"kebab hostname (full-length)":           {"my-host-name-123456789", inputs{"my-host-name", "-", "i-123456789", -1}},
-		"kebab hostname expanded (full-length)":  {"my-host-name-123456789", inputs{"my-host-name-12", "-", "i-123456789", -1}},
+		"kebab hostname expanded (full-length)":  {"my-host-name-12-123456789", inputs{"my-host-name-12", "-", "i-123456789", -1}},
 		"kebab duplicate id hostname truncated7": {"my-abcdefg-host-abcdefg", inputs{"my-abcdefg-host", "-", "i-abcdefg", -1}},
 	}
+
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			hostname, err := computeHostnameWithInstanceID(tt.inputs.hostname,

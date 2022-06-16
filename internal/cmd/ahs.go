@@ -9,7 +9,6 @@ import (
 	"regexp"
 	"sort"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -318,43 +317,19 @@ func (c *Clients) setTagValue(instanceID, tag, value string) (err error) {
 func computeHostnameWithInstanceID(base, separator, instanceID string, length int) (string, error) {
 	log.Info("Computing hostname with truncated instance-id")
 
-	// remove i-
-	awsInstanceID := instanceID[2:]
-	truncatedID := truncateString(awsInstanceID, length)
+	if length <= 0 || length > len(instanceID) {
+		length = len(instanceID) - 2
+	}
 
-	if base == truncatedID {
+	if len(base) >= length && base[len(base)-length:] == instanceID[2:2+length] {
 		log.Infof("Instance ID already found in the instance tag : '%s', reusing this value", base)
 		return base, nil
 	}
 
-	splitHost := strings.Split(base, separator)
-	log.Infof("splitHost : '%v'", splitHost)
-	splitIndex := len(splitHost) - 1
-	if len(splitHost) <= 1 {
-		splitIndex = 1
-	}
-	hostnameIncluded := strings.Contains(awsInstanceID, splitHost[len(splitHost)-1])
-	if !hostnameIncluded {
-		splitIndex = len(splitHost)
-	}
-
-	hostnamePrefix := strings.Join(splitHost[:splitIndex], separator)
-	hostname := strings.Join([]string{hostnamePrefix, truncatedID}, separator)
+	hostname := base + separator + instanceID[2:2+length]
+	log.Infof("Computed unique hostname : '%s'", hostname)
 
 	return hostname, nil
-}
-
-func truncateString(str string, length int) string {
-	if length <= 0 {
-		return str
-	}
-
-	clampedLength := len(str)
-	if length < clampedLength {
-		clampedLength = length
-	}
-
-	return str[:clampedLength]
 }
 
 func computeSequentialHostname(base, separator string, sequentialID int) (string, error) {
