@@ -7,7 +7,7 @@ require (
 	github.com/jpillora/backoff v1.0.0
 	github.com/mvisonneau/go-helpers v0.0.1
 	github.com/sirupsen/logrus v1.8.1
-	github.com/stretchr/testify v1.7.2
+	github.com/stretchr/testify v1.7.5
 	github.com/txn2/txeh v1.3.0
 	github.com/urfave/cli/v2 v2.8.1
 )
