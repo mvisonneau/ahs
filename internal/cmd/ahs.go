@@ -12,8 +12,6 @@ import (
 	"strings"
 	"time"
 
-	"golang.org/x/exp/slices"
-
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -550,7 +548,15 @@ func computeMostAdequateSequentialID(instances *ec2.DescribeInstancesOutput, seq
 
 	for _, reservation := range instances.Reservations {
 		for _, instance := range reservation.Instances {
-			if !slices.Contains(strings.Split(validInstanceStates, ","), *instance.State.Name) {
+			stateFound := false
+
+			for _, state := range strings.Split(validInstanceStates, ",") {
+				if *instance.State.Name == state {
+					stateFound = true
+				}
+			}
+
+			if stateFound != true {
 				continue
 			}
 

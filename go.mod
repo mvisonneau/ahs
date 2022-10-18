@@ -10,7 +10,6 @@ require (
 	github.com/stretchr/testify v1.7.2
 	github.com/txn2/txeh v1.3.0
 	github.com/urfave/cli/v2 v2.8.1
-	golang.org/x/exp v0.0.0-20221012211006-4de253d81b95
 )
 
 require (
