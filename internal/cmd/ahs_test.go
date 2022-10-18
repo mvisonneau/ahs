@@ -3,6 +3,8 @@ package cmd
 import (
 	"testing"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -11,6 +13,14 @@ type inputs struct {
 	separator  string
 	instanceID string
 	length     int
+}
+
+type sequentialInputs struct {
+	instances           *ec2.DescribeInstancesOutput
+	sequentialIDTag     string
+	offset              int
+	modulo              int
+	validInstanceStates string
 }
 
 func TestComputeHostnameWithInstanceID(t *testing.T) {
@@ -53,6 +63,256 @@ func TestValidComputeRegionFromAZ(t *testing.T) {
 func TestInvalidComputeRegionFromAZ(t *testing.T) {
 	_, err := computeRegionFromAZ("foo")
 	assert.NotNil(t, err)
+}
+
+func TestComputeMostAdequateSequentialID(t *testing.T) {
+	tests := map[string]struct {
+		testInput      sequentialInputs
+		expectedResult int
+	}{
+		"only-running-instances-running-filter": { // nolint
+			testInput: sequentialInputs{
+				instances: &ec2.DescribeInstancesOutput{
+					NextToken: nil,
+					Reservations: []*ec2.Reservation{
+						{
+							Instances: []*ec2.Instance{
+								{
+									State: &ec2.InstanceState{
+										Code: aws.Int64(16),
+										Name: aws.String("running"),
+									},
+									Tags: []*ec2.Tag{
+										{
+											Key:   aws.String("ahs:instance-id"),
+											Value: aws.String("1"),
+										},
+									},
+									InstanceId: aws.String("blah-1"),
+								},
+								{
+									State: &ec2.InstanceState{
+										Code: aws.Int64(16),
+										Name: aws.String("running"),
+									},
+									Tags: []*ec2.Tag{
+										{
+											Key:   aws.String("ahs:instance-id"),
+											Value: aws.String("2"),
+										},
+									},
+									InstanceId: aws.String("blah-2"),
+								},
+								{
+									State: &ec2.InstanceState{
+										Code: aws.Int64(16),
+										Name: aws.String("running"),
+									},
+									Tags: []*ec2.Tag{
+										{
+											Key:   aws.String("ahs:instance-id"),
+											Value: aws.String("3"),
+										},
+									},
+									InstanceId: aws.String("blah-3"),
+								},
+							},
+						},
+					},
+				},
+				sequentialIDTag:     "ahs:instance-id",
+				offset:              1,
+				modulo:              1,
+				validInstanceStates: "running",
+			},
+			expectedResult: 4,
+		},
+		"only-running-instances-running-stopped-filter": { // nolint
+			testInput: sequentialInputs{
+				instances: &ec2.DescribeInstancesOutput{
+					NextToken: nil,
+					Reservations: []*ec2.Reservation{
+						{
+							Instances: []*ec2.Instance{
+								{
+									State: &ec2.InstanceState{
+										Code: aws.Int64(16),
+										Name: aws.String("running"),
+									},
+									Tags: []*ec2.Tag{
+										{
+											Key:   aws.String("ahs:instance-id"),
+											Value: aws.String("1"),
+										},
+									},
+									InstanceId: aws.String("blah-1"),
+								},
+								{
+									State: &ec2.InstanceState{
+										Code: aws.Int64(16),
+										Name: aws.String("running"),
+									},
+									Tags: []*ec2.Tag{
+										{
+											Key:   aws.String("ahs:instance-id"),
+											Value: aws.String("2"),
+										},
+									},
+									InstanceId: aws.String("blah-2"),
+								},
+								{
+									State: &ec2.InstanceState{
+										Code: aws.Int64(16),
+										Name: aws.String("running"),
+									},
+									Tags: []*ec2.Tag{
+										{
+											Key:   aws.String("ahs:instance-id"),
+											Value: aws.String("3"),
+										},
+									},
+									InstanceId: aws.String("blah-3"),
+								},
+							},
+						},
+					},
+				},
+				sequentialIDTag:     "ahs:instance-id",
+				offset:              1,
+				modulo:              1,
+				validInstanceStates: "running,stopped",
+			},
+			expectedResult: 4,
+		},
+		"running-and-stopped-instances-running-filter": { // nolint
+			testInput: sequentialInputs{
+				instances: &ec2.DescribeInstancesOutput{
+					NextToken: nil,
+					Reservations: []*ec2.Reservation{
+						{
+							Instances: []*ec2.Instance{
+								{
+									State: &ec2.InstanceState{
+										Code: aws.Int64(16),
+										Name: aws.String("running"),
+									},
+									Tags: []*ec2.Tag{
+										{
+											Key:   aws.String("ahs:instance-id"),
+											Value: aws.String("1"),
+										},
+									},
+									InstanceId: aws.String("blah-1"),
+								},
+								{
+									State: &ec2.InstanceState{
+										Code: aws.Int64(80),
+										Name: aws.String("stopped"),
+									},
+									Tags: []*ec2.Tag{
+										{
+											Key:   aws.String("ahs:instance-id"),
+											Value: aws.String("2"),
+										},
+									},
+									InstanceId: aws.String("blah-2"),
+								},
+								{
+									State: &ec2.InstanceState{
+										Code: aws.Int64(80),
+										Name: aws.String("stopped"),
+									},
+									Tags: []*ec2.Tag{
+										{
+											Key:   aws.String("ahs:instance-id"),
+											Value: aws.String("3"),
+										},
+									},
+									InstanceId: aws.String("blah-3"),
+								},
+							},
+						},
+					},
+				},
+				sequentialIDTag:     "ahs:instance-id",
+				offset:              1,
+				modulo:              1,
+				validInstanceStates: "running",
+			},
+			expectedResult: 2,
+		},
+		"running-and-stopped-instances-running-stopped-filter": { // nolint
+			testInput: sequentialInputs{
+				instances: &ec2.DescribeInstancesOutput{
+					NextToken: nil,
+					Reservations: []*ec2.Reservation{
+						{
+							Instances: []*ec2.Instance{
+								{
+									State: &ec2.InstanceState{
+										Code: aws.Int64(16),
+										Name: aws.String("running"),
+									},
+									Tags: []*ec2.Tag{
+										{
+											Key:   aws.String("ahs:instance-id"),
+											Value: aws.String("1"),
+										},
+									},
+									InstanceId: aws.String("blah-1"),
+								},
+								{
+									State: &ec2.InstanceState{
+										Code: aws.Int64(80),
+										Name: aws.String("stopped"),
+									},
+									Tags: []*ec2.Tag{
+										{
+											Key:   aws.String("ahs:instance-id"),
+											Value: aws.String("2"),
+										},
+									},
+									InstanceId: aws.String("blah-2"),
+								},
+								{
+									State: &ec2.InstanceState{
+										Code: aws.Int64(80),
+										Name: aws.String("stopped"),
+									},
+									Tags: []*ec2.Tag{
+										{
+											Key:   aws.String("ahs:instance-id"),
+											Value: aws.String("3"),
+										},
+									},
+									InstanceId: aws.String("blah-3"),
+								},
+							},
+						},
+					},
+				},
+				sequentialIDTag:     "ahs:instance-id",
+				offset:              1,
+				modulo:              1,
+				validInstanceStates: "running,stopped",
+			},
+			expectedResult: 4,
+		},
+	}
+
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			id, err := computeMostAdequateSequentialID(
+				tt.testInput.instances,
+				tt.testInput.sequentialIDTag,
+				tt.testInput.offset,
+				tt.testInput.modulo,
+				tt.testInput.validInstanceStates,
+			)
+			assert.Nil(t, err)
+			assert.Equal(t, tt.expectedResult, id)
+		})
+	}
 }
 
 // func TestUpdateHostnameFile(t *testing.T) {
