@@ -111,6 +111,12 @@ func NewApp(version string, start time.Time) (app *cli.App) {
 					EnvVars: []string{"AHS_RESPECT_AZS"},
 					Usage:   "if instances are provisioned through an ASG, setting this flag it will get the sequential-ids associated to respective azs", //nolint
 				},
+				&cli.StringFlag{
+					Name:    "valid-instance-states",
+					EnvVars: []string{"AHS_VALID_INSTANCE_STATES"},
+					Usage:   "comma-delimited list selecting which instance states (running, stopped, etc.) are valid when filtering instances to take into account for assigning sequential ids",
+					Value:   "running",
+				},
 			},
 			Action: cmd.ExecWrapper(cmd.Run),
 		},

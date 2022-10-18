@@ -9,7 +9,10 @@ import (
 	"regexp"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
+
+	"golang.org/x/exp/slices"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/ec2metadata"
@@ -139,6 +142,7 @@ func Run(ctx *cli.Context) (int, error) { // nolint
 				instanceGroup,
 				ctx.String("instance-group-tag"),
 				ctx.String("instance-sequential-id-tag"),
+				ctx.String("valid-instance-states"),
 			); err != nil {
 				return 1, err
 			}
@@ -152,6 +156,7 @@ func Run(ctx *cli.Context) (int, error) { // nolint
 				v.AZ, instanceGroup,
 				ctx.String("instance-group-tag"),
 				ctx.String("instance-sequential-id-tag"),
+				ctx.String("valid-instance-states"),
 			); err != nil {
 				return 1, err
 			}
@@ -461,9 +466,10 @@ func (c *Clients) getASGMaxInstances(asgName string) (int, error) {
 	return int(*asg.MaxSize), nil
 }
 
-func (c *Clients) findAvailableSequentialIDPerRegion(instanceGroup, groupTag, sequentialIDTag string) (int, error) {
+func (c *Clients) findAvailableSequentialIDPerRegion(instanceGroup, groupTag, sequentialIDTag string, validInstanceStates string) (int, error) {
 	log.Debugf("Looking up instances that belong to the same group within the region")
 
+	// TODO: Need to handle pagination or set a default number of MaxItems.
 	instances, err := c.EC2.DescribeInstances(&ec2.DescribeInstancesInput{
 		Filters: []*ec2.Filter{
 			{
@@ -478,10 +484,10 @@ func (c *Clients) findAvailableSequentialIDPerRegion(instanceGroup, groupTag, se
 		return -1, err
 	}
 
-	return computeMostAdequateSequentialID(instances, sequentialIDTag, 1, 1)
+	return computeMostAdequateSequentialID(instances, sequentialIDTag, 1, 1, validInstanceStates)
 }
 
-func (c *Clients) findAvailableSequentialIDPerAZ(instanceAZ, instanceGroup, groupTag, sequentialIDTag string) (int, error) {
+func (c *Clients) findAvailableSequentialIDPerAZ(instanceAZ, instanceGroup, groupTag, sequentialIDTag string, validInstanceStates string) (int, error) {
 	log.Debugf("Looking up how many AZs are configured on the ASG")
 
 	azs, err := c.getASGAZs(instanceGroup)
@@ -527,7 +533,7 @@ func (c *Clients) findAvailableSequentialIDPerAZ(instanceAZ, instanceGroup, grou
 		}
 	}
 
-	computedID, err := computeMostAdequateSequentialID(instances, sequentialIDTag, offset, len(azs))
+	computedID, err := computeMostAdequateSequentialID(instances, sequentialIDTag, offset, len(azs), validInstanceStates)
 	if err != nil {
 		return -1, err
 	}
@@ -539,12 +545,12 @@ func (c *Clients) findAvailableSequentialIDPerAZ(instanceAZ, instanceGroup, grou
 	return computedID, nil
 }
 
-func computeMostAdequateSequentialID(instances *ec2.DescribeInstancesOutput, sequentialIDTag string, offset, modulo int) (int, error) { // nolint
+func computeMostAdequateSequentialID(instances *ec2.DescribeInstancesOutput, sequentialIDTag string, offset, modulo int, validInstanceStates string) (int, error) { // nolint
 	var used []int
 
 	for _, reservation := range instances.Reservations {
 		for _, instance := range reservation.Instances {
-			if *instance.State.Name != "running" {
+			if !slices.Contains(strings.Split(validInstanceStates, ","), *instance.State.Name) {
 				continue
 			}
 
