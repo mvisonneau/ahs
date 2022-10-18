@@ -5,7 +5,6 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
-
 	"github.com/stretchr/testify/assert"
 )
 
@@ -71,7 +70,7 @@ func TestComputeMostAdequateSequentialID(t *testing.T) {
 		testInput      sequentialInputs
 		expectedResult int
 	}{
-		"only-running-instances-running-filter": {
+		"only-running-instances-running-filter": { // nolint
 			testInput: sequentialInputs{
 				instances: &ec2.DescribeInstancesOutput{
 					NextToken: nil,
@@ -128,7 +127,7 @@ func TestComputeMostAdequateSequentialID(t *testing.T) {
 			},
 			expectedResult: 4,
 		},
-		"only-running-instances-running-stopped-filter": {
+		"only-running-instances-running-stopped-filter": { // nolint
 			testInput: sequentialInputs{
 				instances: &ec2.DescribeInstancesOutput{
 					NextToken: nil,
@@ -185,7 +184,7 @@ func TestComputeMostAdequateSequentialID(t *testing.T) {
 			},
 			expectedResult: 4,
 		},
-		"running-and-stopped-instances-running-filter": {
+		"running-and-stopped-instances-running-filter": { // nolint
 			testInput: sequentialInputs{
 				instances: &ec2.DescribeInstancesOutput{
 					NextToken: nil,
@@ -242,7 +241,7 @@ func TestComputeMostAdequateSequentialID(t *testing.T) {
 			},
 			expectedResult: 2,
 		},
-		"running-and-stopped-instances-running-stopped-filter": {
+		"running-and-stopped-instances-running-stopped-filter": { // nolint
 			testInput: sequentialInputs{
 				instances: &ec2.DescribeInstancesOutput{
 					NextToken: nil,

@@ -466,7 +466,7 @@ func (c *Clients) getASGMaxInstances(asgName string) (int, error) {
 	return int(*asg.MaxSize), nil
 }
 
-func (c *Clients) findAvailableSequentialIDPerRegion(instanceGroup, groupTag, sequentialIDTag string, validInstanceStates string) (int, error) {
+func (c *Clients) findAvailableSequentialIDPerRegion(instanceGroup, groupTag, sequentialIDTag string, validInstanceStates string) (int, error) { // nolint
 	log.Debugf("Looking up instances that belong to the same group within the region")
 
 	// TODO: Need to handle pagination or set a default number of MaxItems.
@@ -487,7 +487,7 @@ func (c *Clients) findAvailableSequentialIDPerRegion(instanceGroup, groupTag, se
 	return computeMostAdequateSequentialID(instances, sequentialIDTag, 1, 1, validInstanceStates)
 }
 
-func (c *Clients) findAvailableSequentialIDPerAZ(instanceAZ, instanceGroup, groupTag, sequentialIDTag string, validInstanceStates string) (int, error) {
+func (c *Clients) findAvailableSequentialIDPerAZ(instanceAZ, instanceGroup, groupTag, sequentialIDTag string, validInstanceStates string) (int, error) { // nolint
 	log.Debugf("Looking up how many AZs are configured on the ASG")
 
 	azs, err := c.getASGAZs(instanceGroup)

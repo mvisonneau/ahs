@@ -114,7 +114,7 @@ func NewApp(version string, start time.Time) (app *cli.App) {
 				&cli.StringFlag{
 					Name:    "valid-instance-states",
 					EnvVars: []string{"AHS_VALID_INSTANCE_STATES"},
-					Usage:   "comma-delimited list selecting which instance states (running, stopped, etc.) are valid when filtering instances to take into account for assigning sequential ids",
+					Usage:   "comma-delimited list selecting which instance states (running, stopped, etc.) are valid when filtering instances to take into account for assigning sequential ids", // nolint
 					Value:   "running",
 				},
 			},
